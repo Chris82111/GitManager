@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="GitWrapper.Core/GitWrapper.Core.csproj" />
+  <Project Path="GitWrapper.Static.LinuxX64/GitWrapper.Static.LinuxX64.csproj" Id="88e1ffa4-5ca5-4931-b998-d700266e3d46" />
+  <Project Path="GitWrapper.Static.WindowsX64/GitWrapper.Static.WindowsX64.csproj" />
+  <Project Path="GitWrapper.TestReference/GitWrapper.TestReference.csproj" Id="7ab7f323-2d1e-4704-88d0-b3003062ce30" />
+</Solution>

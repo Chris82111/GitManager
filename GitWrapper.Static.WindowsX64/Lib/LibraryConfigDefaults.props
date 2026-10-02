@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup Condition="'$(EnableStaticGitUseWindows)' == ''">
+    <EnableStaticGitUseWindows>true</EnableStaticGitUseWindows>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net10.0</TargetFramework>
+	  <PlatformTarget>AnyCPU</PlatformTarget>
+	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <RootNamespace>Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+	  <Version>1.0.0</Version>
+	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	  <PackageId>Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</PackageId>
+	  <Authors>Chris82111</Authors>
+	  <Company>GitManager</Company>
+	  <RepositoryUrl>https://github.com/Chris82111/GitManager</RepositoryUrl>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <RepositoryType>git</RepositoryType>
+	  <PackageTags>Git;Portable</PackageTags>
+	  <Product>GitManager</Product>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <Copyright>Copyright (c) Chris82111 2025</Copyright>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>Core solution for using Git in a portable form.
+    
+Supports: Locally installed Git and system-specific plugins</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include="LICENSE" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>
