@@ -10,11 +10,10 @@
     <RootNamespace>Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <Version>1.0.0</Version>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <PackageId>Chris82111.GitManager.$(MSBuildProjectName.Replace(" ", "_"))</PackageId>
+    <PackageId>Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</PackageId>
     <Authors>Chris82111</Authors>
     <Company>GitManager</Company>
     <RepositoryUrl>https://github.com/Chris82111/GitManager</RepositoryUrl>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RepositoryType>git</RepositoryType>
     <PackageTags>Git;Portable;Static;Windows</PackageTags>
@@ -23,10 +22,13 @@
     <Copyright>Copyright (c) Chris82111 2025</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Description>Plugin to extend the Core solution for using Git in a portable form.
+    
+Supports: Windows X64</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GitWrapper\GitWrapper.Core.csproj" />
+    <ProjectReference Include="..\GitWrapper.Core\GitWrapper.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

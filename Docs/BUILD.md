@@ -1,6 +1,6 @@
 # Build 
 
-Except for the [#License](#license) and [#Acknowledgment](#acknowledgment) sections, the following sections are only relevant to developers. This applies to those who want to clone the repository and compile it themselves. They can be skipped when using NuGet.
+Except for the [#License](./LICENSES.md#license) and [#Acknowledgment](./../README.md#acknowledgment) sections, the following sections are only relevant to developers. This applies to those who want to clone the repository and compile it themselves. They can be skipped when using NuGet.
 
 Docker is required for the build process; WSL is also required on Windows.  
 The build process takes approximately 9 minutes.
@@ -28,7 +28,7 @@ There are various ways to disable individual functions during the build:
 
 ## Clean
 
-When the project is cleaned up, a `.docker-no-cache` file is created in the project folder `LibCsharpStaticGitCollection`. This file is deleted when the project is recompiled, but it ensures that the next Docker build process is performed without using the cache. However, the build is only performed if there is no packaged file in the `runtimes` folder. It is allowed to create or delete the file manually.
+When the project is cleaned up, a `.docker-no-cache` file is created in the project folder `GitWrapper.Static.LinuxX64`. This file is deleted when the project is recompiled, but it ensures that the next Docker build process is performed without using the cache. However, the build is only performed if there is no packaged file in the `runtimes` folder. It is allowed to create or delete the file manually.
 
 You can clean up the project using the command:
 
@@ -38,8 +38,8 @@ dotnet clean
 
 ## Update 
 
-The version of Git for Windows (MinGit) can be specified in the file [GitWindows.props](LibCsharpStaticGitCollection/Lib/GitWindows.props).  
-The individual versions of Git for Linux can be specified in the [Dockerfile](LibCsharpStaticGitCollection/Lib/Dockerfile) file.
+The version of Git for Windows (MinGit) can be specified in the file [GitWindows.props](./../GitWrapper.Static.WindowsX64/Lib/GitWindows.props).  
+The individual versions of Git for Linux can be specified in the [Dockerfile](./../GitWrapper.Static.LinuxX64/Lib/Dockerfile) file.
 
 ## Docker
 
@@ -73,7 +73,7 @@ Here is a list of common mistakes:
 
    ```shell
    EXEC : error : failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory
-       LibCsharpStaticGitCollection/LibCsharpStaticGitCollection/Lib/GitLinux.targets(27,5): error MSB3073: The command "docker build --progress=plain -f LibCsharpStaticGitCollection/LibCsharpStaticGitCollection/Lib/Dockerfile -t staticgitbuildtempimage LibCsharpStaticGitCollection/LibCsharpStaticGitCollection/Lib" exited with code 1.
+       GitManager/GitWrapper.Static.LinuxX64/Lib/GitLinux.targets(27,5): error MSB3073: The command "docker build --progress=plain -f GitManager/GitWrapper.Static.LinuxX64/Lib/Dockerfile -t staticgitbuildtempimage GitManager/GitWrapper.Static.LinuxX64/Lib" exited with code 1.
    ```
    
    Do not use an NTFS-mounted drive. This can cause Docker to be unable to find the `Dockerfile` file.
@@ -81,9 +81,9 @@ Here is a list of common mistakes:
 2. Permission denied:
    
    ```shell
-   LibCsharpStaticGitCollection failed with 2 error(s) (0.1s)
+   GitManager failed with 2 error(s) (0.1s)
        EXEC : error : permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Head "http://%2Fvar%2Frun%2Fdocker.sock/_ping": dial unix /var/run/docker.sock: connect: permission denied
-       LibCsharpStaticGitCollection/LibCsharpStaticGitCollection/Lib/GitLinux.targets(21,5): error MSB3073: The command "docker build --progress=plain -t staticgitbuildtempimage ." exited with code 1.
+       GitManager/GitWrapper.Static.LinuxX64/Lib/GitLinux.targets(21,5): error MSB3073: The command "docker build --progress=plain -t staticgitbuildtempimage ." exited with code 1.
    ```
    
    To provoke this error, you can run `docker ps` in the terminal. An error should then appear due to insufficient permissions. This error can be resolved as follows. The current user must be added to the Docker group. Enter the following commands:
@@ -132,8 +132,8 @@ dotnet nuget add source C:\NuGetPackages\ -n local
 The following command creates a NuGet package and transfers it to a local package feed named `local`:
 
 1. Navigate to the repository directory.
-2. Change the Version in the file `LibCsharpStaticGitCollection/LibCsharpStaticGitCollection.csproj` in the tag `Project/PropertyGroup/Version`, #Major.#Minor.#Patch.
-3. Creating a NuGet package:
+2. Change the Version in the files `*.csproj` in the tag `Project/PropertyGroup/Version`, #Major.#Minor.#Patch.
+3. Creating all NuGet packages:
    
    ```shell
    dotnet pack -c Release -o .
@@ -142,7 +142,9 @@ The following command creates a NuGet package and transfers it to a local packag
 4. Once you create a NuGet package it can be published to the local package feed:
    
    ```shell
-   dotnet nuget push Chris82111.LibCsharpStaticGitCollection.#Major.#Minor.#Patch.nupkg -s local
+   dotnet nuget push Chris82111.GitManager.GitWrapper.Core.1.0.0.nupkg -s local
+   dotnet nuget push Chris82111.GitManager.GitWrapper.Static.WindowsX64.1.0.0.nupkg -s local
+   dotnet nuget push Chris82111.GitManager.GitWrapper.Static.LinuxX64.1.0.0.nupkg -s local
    ```
    
 5. Clear the NuGet caches:
@@ -150,7 +152,9 @@ The following command creates a NuGet package and transfers it to a local packag
    ```shell
    dotnet nuget locals all --clear
    ```
-   
+
+5. Restart Visual Studio
+
 6. Run tests:
    
    ```shell
@@ -162,5 +166,7 @@ The following command creates a NuGet package and transfers it to a local packag
 Lists all versions of a NuGet package that are available in your configured package sources:
 
 ```shell
-dotnet package search Chris82111.LibCsharpStaticGitCollection --exact-match
+dotnet package search Chris82111.GitManager.GitWrapper.Core.1.0.0.nupkg --exact-match
+dotnet package search Chris82111.GitManager.GitWrapper.Static.WindowsX64.1.0.0.nupkg --exact-match
+dotnet package search Chris82111.GitManager.GitWrapper.Static.LinuxX64.1.0.0.nupkg --exact-match
 ```

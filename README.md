@@ -1,4 +1,4 @@
-# LibCsharpStaticGitCollection
+# GitManager
 
 <div align="center">
 

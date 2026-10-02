@@ -2,7 +2,7 @@
 
 This repository has the [MIT](https://spdx.org/licenses/MIT.html) license ([LICENSE](LICENSE) file), but it uses many other projects, each of which has its own license that must be observed, see [THIRD_PARTY_LICENSES](THIRD_PARTY_LICENSES).
 
-<!-- The `LICENSE` and `THIRD_PARTY_LICENSES` files are copied to the `LibCsharpStaticGitCollection` repository published by NuGet. -->
+<!-- The `LICENSE` and `THIRD_PARTY_LICENSES` files are copied to the repositories published by NuGet. -->
 
 More about licensing: [licensing-a-repository](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository) and [SPDX-licenses](https://spdx.org/licenses/).
 
