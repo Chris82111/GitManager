@@ -11,7 +11,7 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
     {
         public TestContext TestContext { get; set; } = null!;
         public TestContext Console { get => TestContext; set => TestContext = value; }
-        const string RepositoryName = "LibCsharpStaticGitCollection";
+        const string RepositoryName = "GitManager";
 
         [TestMethod]
         public void Test_01_CreateTypesDirect()

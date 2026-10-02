@@ -44,7 +44,7 @@
 # export GIT_SSL_CAINFO=""<yourPath>/ca/ca.pem"
 
 # Test
-# git clone https://github.com/Chris82111/LibCsharpStaticGitCollection.git
+# git clone https://github.com/Chris82111/GitManager.git
 
 
 #------------------------------------------------------------------------------
@@ -571,7 +571,7 @@ RUN \
 RUN git --version || (echo "ERROR:"; exit 1)
 
 RUN \
-  git clone https://github.com/Chris82111/LibCsharpStaticGitCollection.git || \
+  git clone https://github.com/Chris82111/GitManager.git || \
   (echo "ERROR:"; exit 1)
 
 
@@ -604,17 +604,17 @@ RUN \
   fi
 
 RUN \
-  git clone https://github.com/Chris82111/LibCsharpStaticGitCollection.git ; if [ $? -ne 0 ] ; then \
+  git clone https://github.com/Chris82111/GitManager.git ; if [ $? -ne 0 ] ; then \
     echo "ERROR: git clone ... command failed"; exit 1; \
   fi
 
 RUN \
-  if [ ! -d /build/git-test/LibCsharpStaticGitCollection ] ; then \
+  if [ ! -d /build/git-test/GitManager ] ; then \
     echo "ERROR: git clone ... failed"; exit 1; \
   fi
   
 RUN \
-  if [ ! -f /build/git-test/LibCsharpStaticGitCollection/README.md ] ; then \
+  if [ ! -f /build/git-test/GitManager/README.md ] ; then \
     echo "ERROR: git clone ... failed"; exit 1; \
   fi
 
@@ -642,7 +642,7 @@ RUN bash -c "\
 
 RUN bash -c "\
     source /opt/my/test/git/setup-git-env.sh && \
-    git clone https://github.com/Chris82111/LibCsharpStaticGitCollection.git || { \
+    git clone https://github.com/Chris82111/GitManager.git || { \
         echo 'ERROR: git clone ... command failed'; \
         exit 1; \
     }\
@@ -651,12 +651,12 @@ RUN bash -c "\
 RUN ls /build/git-test/
 
 RUN \
-  if [ ! -d /build/git-test/LibCsharpStaticGitCollection ] ; then \
+  if [ ! -d /build/git-test/GitManager ] ; then \
     echo "ERROR: git clone ... failed"; exit 1; \
   fi
   
 RUN \
-  if [ ! -f /build/git-test/LibCsharpStaticGitCollection/README.md ] ; then \
+  if [ ! -f /build/git-test/GitManager/README.md ] ; then \
     echo "ERROR: git clone ... failed"; exit 1; \
   fi
 
