@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifier>windows-x64</RuntimeIdentifier>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <Version>1.0.0</Version>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <PackageId>Chris82111.GitManager.$(MSBuildProjectName.Replace(" ", "_"))</PackageId>
+    <Authors>Chris82111</Authors>
+    <Company>GitManager</Company>
+    <RepositoryUrl>https://github.com/Chris82111/GitManager</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Git;Portable;Static;Windows</PackageTags>
+    <Product>GitManager</Product>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>Copyright (c) Chris82111 2025</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GitWrapper\GitWrapper.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include="LICENSE" Pack="true" PackagePath="/" />
+    <None Include="THIRD_PARTY_LICENSES" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <Import Project="Lib/LibraryConfigDefaults.props" />
+  <Import Project="Lib/LibraryConfigOverrides.props" Condition="Exists('Lib/LibraryConfigOverrides.props')" />
+
+  <!-- PROPS first -->
+  <Import Project="Lib/GitWindows.props" />
+
+  <!-- TARGETS last -->
+  <Import Project="Lib/GitWindows.targets" />
+</Project>

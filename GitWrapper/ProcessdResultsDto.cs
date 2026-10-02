@@ -1,9 +1,9 @@
-﻿namespace Chris82111.LibCsharpStaticGitCollection.Dtos
+﻿namespace Chris82111.GitManager.GitWrapper.Core
 {
     /// <summary>
     /// Data transfer object for passing on information about the system processes used.
     /// </summary>
-    public class CallGitProcessdResultsDto
+    public class ProcessResultsDto
     {
         /// <summary>
         /// Standard output of the application.

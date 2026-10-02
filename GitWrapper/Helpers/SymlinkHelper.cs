@@ -1,24 +1,43 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-namespace Chris82111.LibCsharpStaticGitCollection.Helpers
+namespace Chris82111.GitManager.GitWrapper.Core.Helpers
 {
-    internal static class SymlinkChecker
+    /// <summary>
+    /// Helps with working with symlinks (only Linux)
+    /// </summary>
+    public static partial class SymlinkHelper
     {
-        // Import the native symlink function
+        /// <summary>
+        /// Creates a symbolic link at the specified path that points to the specified target.
+        /// </summary>
+        /// <param name="target">The path of the file or directory to which the symbolic link points.</param>
+        /// <param name="linkpath">The path at which to create the symbolic link.</param>
+        /// <returns>
+        ///         0 if the symbolic link was created successfully; 
+        /// <br/>   -1 otherwise
+        /// </returns>
         [SupportedOSPlatform("linux")]
-        [DllImport("libc", SetLastError = true, CharSet = CharSet.Ansi)]
-        private static extern int symlink(string target, string linkpath);
+        [LibraryImport(
+            "libc",
+            EntryPoint = "symlink",
+            SetLastError = true,
+            StringMarshalling = StringMarshalling.Utf8)]
+        private static partial int Symlink(string target, string linkpath);
 
-        [SupportedOSPlatform("linux")]
+        /// <summary>
+        /// Ensures that symbolic links are supported in the specified directory.
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <exception cref="PlatformNotSupportedException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         public static void EnsureSymlinkSupported(string? directory = null)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (false == RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 throw new PlatformNotSupportedException(
                     "Symlink support check using libc.symlink() is only valid on Linux. " +
-                    "Do not call this method on Windows or macOS.");
+                    "Do not call this method on Windows.");
             }
 
             if (string.IsNullOrEmpty(directory))
@@ -35,15 +54,19 @@ namespace Chris82111.LibCsharpStaticGitCollection.Helpers
             string linkPath = Path.Combine(directory, "symlink_test_link");
 
             // First, check write access
-            if (!IsWritable(directory))
+            if (false == IsWritable(directory))
             {
                 throw new InvalidOperationException(
                     $"Cannot write to the directory '{directory}'. Extraction requires write permissions.");
             }
 
             // Now attempt to create a symlink to a nonexistent target
-            int result = symlink("symlink_test_target_nonexistent", linkPath);
-            if (result != 0)
+
+#pragma warning disable CA1416 // Methode does have an runtime check
+            int result = Symlink("symlink_test_target_nonexistent", linkPath);
+#pragma warning restore CA1416
+
+            if (0 != result)
             {
                 int errno = Marshal.GetLastWin32Error();
                 throw new InvalidOperationException(

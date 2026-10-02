@@ -3,7 +3,7 @@
   <PropertyGroup Label="GitLinux" >
     
     <!-- GitLinux.tar.gz -->
-    <GitLinuxZipFile>GitLinux.tar.gz</GitLinuxZipFile>
+    <GitLinuxArchiveFile>GitLinux.tar.gz</GitLinuxArchiveFile>
     
     <!-- runtimes/linux-x64/native -->
     <GitLinuxRuntimeDirectory>$([System.IO.Path]::Combine('runtimes', 'linux-x64', 'native'))</GitLinuxRuntimeDirectory>
@@ -17,8 +17,8 @@
     <!-- setup-git-env.sh -->
     <GitLinuxSetupEnvironment>setup-git-env.sh</GitLinuxSetupEnvironment>
     
-    <!-- GitLinuxLib.cs -->
-    <GitLinuxLibFile>GitLinuxLib.cs</GitLinuxLibFile>
+    <!-- ArchivePaths.cs -->
+    <ArchivePathsFile>ArchivePaths.cs</ArchivePathsFile>
   
   </PropertyGroup>
   
@@ -49,7 +49,7 @@
     
     
     <!-- runtimes/linux-x64/native/GitLinux.tar.gz -->
-    <GitLinuxZipFileRelative>$([System.IO.Path]::Combine('$(GitLinuxRuntimeDirectory)', '$(GitLinuxZipFile)'))</GitLinuxZipFileRelative>
+    <GitLinuxArchiveFileRelative>$([System.IO.Path]::Combine('$(GitLinuxRuntimeDirectory)', '$(GitLinuxArchiveFile)'))</GitLinuxArchiveFileRelative>
     
     <!-- C:/Users/Chris82111/source/repos/LibCsharpStaticGitCollection/LibCsharpStaticGitCollection/Lib -->
     <GitLinuxLibDirectoryFull>$(MSBuildThisFileDirectory.TrimEnd('/').TrimEnd('\'))</GitLinuxLibDirectoryFull>
@@ -66,8 +66,8 @@
     <!-- Lib/setup-git-env.sh -->
     <GitLinuxSetupEnvironmentRelative>$([System.IO.Path]::Combine('$(GitLinuxLibDirectory)', '$(GitLinuxSetupEnvironment)'))</GitLinuxSetupEnvironmentRelative>
     
-    <!-- Lib/GitLinuxLib.cs -->
-    <GitLinuxLibFileRelative>$([System.IO.Path]::Combine('$(GitLinuxLibDirectory)', '$(GitLinuxLibFile)'))</GitLinuxLibFileRelative>
+    <!-- Lib/ArchivePaths.cs -->
+    <ArchivePathsFileRelative>$([System.IO.Path]::Combine('$(GitLinuxLibDirectory)', '$(ArchivePathsFile)'))</ArchivePathsFileRelative>
     
     <!-- Help file for running the next command after a "clean" with the "no-cache" option -->
     <GitLinuxDockerNoCacheFile>$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '.docker-no-cache'))</GitLinuxDockerNoCacheFile>
@@ -83,7 +83,7 @@
   <PropertyGroup Label="GitLinuxRelativeOutput" >
     
     <!-- runtimes/linux-x64/native/GitLinux.tar.gz -->
-    <GitLinuxOutputZipFileRelative>$(GitLinuxZipFileRelative)</GitLinuxOutputZipFileRelative>
+    <GitLinuxOutputArchiveFileRelative>$(GitLinuxArchiveFileRelative)</GitLinuxOutputArchiveFileRelative>
     
     <!-- bin/git -->
     <GitLinuxOutputExecutableRelative>$(GitLinuxExecutableRelative)</GitLinuxOutputExecutableRelative>

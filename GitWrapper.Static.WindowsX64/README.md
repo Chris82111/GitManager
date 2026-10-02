@@ -8,7 +8,6 @@ existing development environments.
 Supports:
 
 - Windows x64
-- Linux x64
 
 Integration can be done either directly via NuGet.org or by cloning the
 repository. This allows the package to be used flexibly either as a direct

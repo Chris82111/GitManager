@@ -1,33 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
-    <RuntimeIdentifier></RuntimeIdentifier>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <RootNamespace>Chris82111.LibCsharpStaticGitCollection</RootNamespace>
-    <Version>1.0.0</Version>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <PackageId>Chris82111.LibCsharpStaticGitCollection</PackageId>
-    <Authors>Chris82111</Authors>
-    <Company>LibCsharpStaticGitCollection</Company>
-    <RepositoryUrl>https://github.com/Chris82111/LibCsharpStaticGitCollection</RepositoryUrl>
-	<PublishRepositoryUrl>true</PublishRepositoryUrl>
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>Git;Portable;Static</PackageTags>
-    <Product>LibCsharpStaticGitCollection</Product>
-    <Description>This repository offers a convenient, cross-platform solution for using Git
+# LibCsharpStaticGitCollection
+
+This [repository](https://github.com/Chris82111/LibCsharpStaticGitCollection) offers a convenient, cross-platform solution for using Git
 in a portable form for Linux and Windows. As a powerful wrapper, it abstracts
 the complexity of Git integration and enables quick and easy integration into
 existing development environments.
 
 Supports:
 
-- Windows x64
-- Linux x64
+- Any local Git installation
 
 Integration can be done either directly via NuGet.org or by cloning the
 repository. This allows the package to be used flexibly either as a direct
@@ -69,29 +49,3 @@ Acknowledgment
 - libpsl: This product includes software developed by the libpsl Project. (https://github.com/rockdaboot/libpsl/tree/master)
 - libcurl: This product includes software developed by the curl Project. (https://curl.se/)
 - Git: This product includes software developed by the Git Project. (https://git-scm.com/)
-</Description>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>Copyright (c) Chris82111 2025</Copyright>
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="/" />
-    <None Include="LICENSE" Pack="true" PackagePath="/" />
-    <None Include="THIRD_PARTY_LICENSES" Pack="true" PackagePath="/" />
-  </ItemGroup>
-  
-  <Import Project="Lib/LibraryConfigDefaults.props" />
-  <Import Project="Lib/LibraryConfigOverrides.props" Condition="Exists('Lib/LibraryConfigOverrides.props')" />
-  
-  <!-- PROPS first -->
-  <Import Project="Lib/GitLinux.props" />
-  <Import Project="Lib/GitWindows.props" />
-  
-  <!-- TARGETS last -->
-  <Import Project="Lib/GitLinux.targets" />
-  <Import Project="Lib/GitWindows.targets" />
-
-</Project>

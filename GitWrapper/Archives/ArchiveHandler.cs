@@ -1,11 +1,21 @@
 ﻿using System.Formats.Tar;
 using System.IO.Compression;
 
-namespace Chris82111.LibCsharpStaticGitCollection.Helpers
+namespace Chris82111.GitManager.GitWrapper.Core.Archives
 {
-    internal class ArchiveHelper
+    /// <summary>
+    /// Class for handling and extracting archives
+    /// </summary>
+    public class ArchiveHandler
     {
-        public static async Task ExtractZipToDirectory(string sourceZipFilePath, string? targetDirectory = null, bool overwriteFiles = true)
+        /// <summary>
+        /// Extracts a Zip archive
+        /// </summary>
+        /// <param name="sourceZipFilePath">File to be extracted</param>
+        /// <param name="targetDirectory">Path where the files will be extracted</param>
+        /// <param name="overwriteFiles">If true, existing files will be overwritten</param>
+        /// <returns></returns>
+        public static async Task ExtractZipToDirectoryAsync(string sourceZipFilePath, string? targetDirectory = null, bool overwriteFiles = true)
         {
             if (string.IsNullOrEmpty(targetDirectory))
             {
@@ -19,7 +29,16 @@ namespace Chris82111.LibCsharpStaticGitCollection.Helpers
                     overwriteFiles: true));
         }
 
-        public static async Task ExtractTarGzToDirectory(string sourceTarGzFilePath, string? targetDirectory = null, bool overwriteFiles = true)
+        /// <summary>
+        /// Extracts a TarGz archive
+        /// </summary>
+        /// <param name="sourceTarGzFilePath">File to be extracted</param>
+        /// <param name="targetDirectory">Path where the files will be extracted</param>
+        /// <param name="overwriteFiles">If true, existing files will be overwritten</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static async Task ExtractTarGzToDirectoryAsync(string sourceTarGzFilePath, string? targetDirectory = null, bool overwriteFiles = true)
         {
             if (string.IsNullOrEmpty(sourceTarGzFilePath))
             {
