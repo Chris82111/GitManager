@@ -7,7 +7,7 @@
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <RootNamespace>Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-	  <Version>1.0.0</Version>
+	  <Version>1.0.0-rc.1</Version>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 	  <PackageId>Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</PackageId>
 	  <Authors>Chris82111</Authors>
