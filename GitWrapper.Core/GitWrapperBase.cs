@@ -186,7 +186,10 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <inheritdoc/>
         public virtual void ExtractArchive(string? destination = null)
         {
-            EnsureSupported();
+            // Every Extract function must implement EnsureSupported.
+            // Since the Asynchronous function is called here, this
+            // is omitted to avoid a duplicate call.
+            // EnsureSupported();
 
             ExtractArchiveAsync(destination)
                 .GetAwaiter()
