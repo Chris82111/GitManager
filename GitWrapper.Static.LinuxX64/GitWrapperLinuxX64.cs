@@ -25,24 +25,24 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
         {
             EnsureSupported();
 
-            var archive = Path.Combine(BaseDirectory, ArchivePaths.ArchiveFileRelative);
-
-            if (false == File.Exists(archive))
-            {
-                throw new FileNotFoundException($"File was no found: {ArchivePaths.ArchiveFileRelative}");
-            }
-
-            if (false == PathHelper.IsExtension(archive, ".tar.gz"))
-            {
-                throw new Exception($"File Extension must be '.tar.gz'");
-            }
-
             var output = GetOutputDirectoryForExtract(destination, ArchivePaths.ArchiveFileRelative);
-
-            SymlinkHelper.EnsureSymlinkSupported(output);
 
             if (PathHelper.IsDirectoryMissingOrEmpty(output))
             {
+                var archive = Path.Combine(BaseDirectory, ArchivePaths.ArchiveFileRelative);
+
+                if (false == File.Exists(archive))
+                {
+                    throw new FileNotFoundException($"File was no found: {ArchivePaths.ArchiveFileRelative}");
+                }
+
+                if (false == PathHelper.IsExtension(archive, ".tar.gz"))
+                {
+                    throw new Exception($"File Extension must be '.tar.gz'");
+                }
+
+                SymlinkHelper.EnsureSymlinkSupported(output);
+
                 await ArchiveHandler.ExtractTarGzToDirectoryAsync(
                     archive,
                     output,

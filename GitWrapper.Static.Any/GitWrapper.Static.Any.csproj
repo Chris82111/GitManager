@@ -15,21 +15,29 @@
     <RepositoryUrl>https://github.com/Chris82111/GitManager</RepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Git;Portable</PackageTags>
+    <PackageTags>Git;Portable;Static;Linux;Windows</PackageTags>
     <Product>GitManager</Product>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Copyright>Copyright (c) Chris82111 2025</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>Core solution for using Git in a portable form.
-    
-Supports: Locally installed Git and system-specific plugins</Description>
+    <Description>Plugin to extend the Core solution for using Git in a portable form.
+
+Supports:
+- Linux X64
+- Windows X64</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GitWrapper.Core\GitWrapper.Core.csproj" />
+    <ProjectReference Include="..\GitWrapper.Static.LinuxX64\GitWrapper.Static.LinuxX64.csproj" />
+    <ProjectReference Include="..\GitWrapper.Static.WindowsX64\GitWrapper.Static.WindowsX64.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
     <None Include="LICENSE" Pack="true" PackagePath="/" />
+    <None Include="THIRD_PARTY_LICENSES" Pack="true" PackagePath="/" />
   </ItemGroup>
 
 </Project>

@@ -25,22 +25,22 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
         {
             EnsureSupported();
 
-            var archive = Path.Combine(BaseDirectory, ArchivePaths.ArchiveFileRelative);
-
-            if (false == File.Exists(archive))
-            {
-                throw new FileNotFoundException($"File was no found: {ArchivePaths.ArchiveFileRelative}");
-            }
-
-            if (".zip" != Path.GetExtension(archive))
-            {
-                throw new Exception($"File Extension must be '.zip'");
-            }
-
             var output = GetOutputDirectoryForExtract(destination, ArchivePaths.ArchiveFileRelative);
 
             if (PathHelper.IsDirectoryMissingOrEmpty(output))
             {
+                var archive = Path.Combine(BaseDirectory, ArchivePaths.ArchiveFileRelative);
+
+                if (false == File.Exists(archive))
+                {
+                    throw new FileNotFoundException($"File was no found: {ArchivePaths.ArchiveFileRelative}");
+                }
+
+                if (".zip" != Path.GetExtension(archive))
+                {
+                    throw new Exception($"File Extension must be '.zip'");
+                }
+            
                 await ArchiveHandler.ExtractZipToDirectoryAsync(
                     archive,
                     output,

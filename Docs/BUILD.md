@@ -154,6 +154,7 @@ The following command creates a NuGet package and transfers it to a local packag
    dotnet nuget push Chris82111.GitManager.GitWrapper.Core.1.0.0.nupkg -s local
    dotnet nuget push Chris82111.GitManager.GitWrapper.Static.WindowsX64.1.0.0.nupkg -s local
    dotnet nuget push Chris82111.GitManager.GitWrapper.Static.LinuxX64.1.0.0.nupkg -s local
+   dotnet nuget push Chris82111.GitManager.GitWrapper.Static.Any.1.0.0.nupkg -s local
    ```
    
 5. Clear the NuGet caches, this is only necessary if the version number is reused:  
