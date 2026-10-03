@@ -82,8 +82,6 @@
   <Target Name="GitLinuxBuildCleanup"
     AfterTargets="GitLinuxBuild"
     Condition="Exists('$(GitLinuxArchiveFileRelative)')" >
-    
-    <Message Text="Git Linux  : Cleanup" Importance="high" />
       
     <!-- Removes the file -->
     <Delete
