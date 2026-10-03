@@ -50,6 +50,8 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
 
         private static void RemoveExtracted(DirectoryInfo directory)
         {
+            Directory.CreateDirectory(directory.FullName);
+
             foreach (var file in Directory.EnumerateFiles(
                 directory.FullName,
                 "*",
@@ -381,6 +383,13 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
         [TestMethod]
         public void Test_Example2()
         {
+            // Required only for the test project. The system is specifically configured
+            // so that an exception is always triggered when a different system is used.
+            if (GitWrapperWindowsX64.ClassIdentifier != GitWrapper.Core.Helpers.RuntimeHelper.Identifier)
+            {
+                return;
+            }
+
             var git = new GitWrapperWindowsX64();
 
             git.ExtractArchive();
