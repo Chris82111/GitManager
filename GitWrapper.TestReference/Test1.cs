@@ -243,9 +243,9 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
             IGitWrapper git;
             string version1, version2;
 
-            var registerd = GitWrapperFactory.Registerd();
+            var registered = GitWrapperFactory.Registered();
 
-            foreach(var identifier in registerd)
+            foreach(var identifier in registered)
             {
                 git = GitWrapperFactory.Create(identifier);
 
@@ -268,9 +268,9 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
             IGitWrapper git;
             string version1, version2;
 
-            var registerd = GitWrapperFactory.Registerd();
+            var registered = GitWrapperFactory.Registered();
 
-            foreach (var identifier in registerd)
+            foreach (var identifier in registered)
             {
                 git = GitWrapperFactory.Create(identifier);
 
@@ -307,8 +307,8 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
             Assert.AreEqual("", result.StandardOutput);
             Assert.AreEqual($"Cloning into '{RepositoryName}'...", result.StandardError);
 
-            var onefile = new FileInfo(Path.Combine(directory.FullName, "README.md"));
-            Assert.IsTrue(onefile.Exists);
+            var oneFile = new FileInfo(Path.Combine(directory.FullName, "README.md"));
+            Assert.IsTrue(oneFile.Exists);
 
             foreach (var file in Directory.EnumerateFiles(
                 directory.FullName,
@@ -341,8 +341,8 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
             Assert.AreEqual("", result.StandardOutput);
             Assert.AreEqual($"Cloning into '{RepositoryName}'...", result.StandardError);
 
-            var onefile = new FileInfo(Path.Combine(directory.FullName, "README.md"));
-            Assert.IsTrue(onefile.Exists);
+            var oneFile = new FileInfo(Path.Combine(directory.FullName, "README.md"));
+            Assert.IsTrue(oneFile.Exists);
 
             foreach (var file in Directory.EnumerateFiles(
                 directory.FullName,
