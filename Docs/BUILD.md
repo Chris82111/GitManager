@@ -3,10 +3,19 @@
 Except for the [#License](./LICENSES.md#license) and [#Acknowledgment](./../README.md#acknowledgment) sections, the following sections are only relevant to developers. This applies to those who want to clone the repository and compile it themselves. They can be skipped when using NuGet.
 
 Docker is required for the build process; WSL is also required on Windows.  
-The build process takes approximately 9 minutes.
+The build process for the Linux binaries takes approximately 10 minutes.
 
 - `dotnet build /p:Configuration=Debug`
 - `dotnet build /p:Configuration=Release`
+
+## Build Tests
+
+The project can be tested using the test project in the repository. The standard tests use the other projects as references. However, it is also possible to use the NuGet packages directly. To do so, they must be available—either by using a published version or by publishing a package locally [see here](#nuget).
+
+- `dotnet test`
+- `dotnet test -p:UseNuGetPackages=true`
+
+## Build Settings
 
 There are various ways to disable individual functions during the build:
 
@@ -36,7 +45,7 @@ You can clean up the project using the command:
 dotnet clean
 ```
 
-## Update 
+## Updating the Runtime Files 
 
 The version of Git for Windows (MinGit) can be specified in the file [GitWindows.props](./../GitWrapper.Static.WindowsX64/Lib/GitWindows.props).  
 The individual versions of Git for Linux can be specified in the [Dockerfile](./../GitWrapper.Static.LinuxX64/Lib/Dockerfile) file.
@@ -129,7 +138,7 @@ dotnet nuget add source C:\NuGetPackages\ -n local
 
 ### Publishing Your Own Version
 
-The following command creates a NuGet package and transfers it to a local package feed named `local`:
+The following command creates a NuGet package and transfers it to a local package feed named `local`:  
 
 1. Navigate to the repository directory.
 2. Change the Version in the files `*.csproj` in the tag `Project/PropertyGroup/Version`, #Major.#Minor.#Patch.
@@ -139,7 +148,7 @@ The following command creates a NuGet package and transfers it to a local packag
    dotnet pack -c Release -o .
    ```
    
-4. Once you create a NuGet package it can be published to the local package feed:
+4. Once you create a NuGet package it can be published to the local package feed:  
    
    ```shell
    dotnet nuget push Chris82111.GitManager.GitWrapper.Core.1.0.0.nupkg -s local
@@ -147,7 +156,7 @@ The following command creates a NuGet package and transfers it to a local packag
    dotnet nuget push Chris82111.GitManager.GitWrapper.Static.LinuxX64.1.0.0.nupkg -s local
    ```
    
-5. Clear the NuGet caches:
+5. Clear the NuGet caches, this is only necessary if the version number is reused:  
    
    ```shell
    dotnet nuget locals all --clear
@@ -159,6 +168,7 @@ The following command creates a NuGet package and transfers it to a local packag
    
    ```shell
    dotnet test
+   dotnet test -p:UseNuGetPackages=true
    ```
 
 ### Additional Commands
