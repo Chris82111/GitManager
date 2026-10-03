@@ -67,7 +67,7 @@
   </Target>
   
   <Target Name="GitWindowsGeneratePath"
-    BeforeTargets="BeforeCompile;Pack"
+    BeforeTargets="CoreCompile;Pack"
     Inputs="$(GitWindowsLibRelative)"
     Outputs="$(ArchivePathsFileRelative)" >
     
@@ -114,6 +114,11 @@ namespace Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_")).Lib
 }
 ' />
   
+  <ItemGroup>
+    <Compile Remove="$(ArchivePathsFileRelative)" />
+    <Compile Include="$(ArchivePathsFileRelative)" />
+  </ItemGroup>
+    
   </Target>
 
 </Project>

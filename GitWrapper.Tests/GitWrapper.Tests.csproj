@@ -13,10 +13,23 @@
     <PackageReference Include="MSTest" Version="4.0.2" />
   </ItemGroup>
 
-  <ItemGroup>
+  <PropertyGroup>
+    <UseNuGetPackages>false</UseNuGetPackages>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UseNuGetPackages)' != 'true'">
     <ProjectReference Include="..\GitWrapper.Static.LinuxX64\GitWrapper.Static.LinuxX64.csproj" />
     <ProjectReference Include="..\GitWrapper.Static.WindowsX64\GitWrapper.Static.WindowsX64.csproj" />
     <ProjectReference Include="..\GitWrapper.Core\GitWrapper.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseNuGetPackages)' == 'true'">
+    <PackageReference Include="Chris82111.GitManager.GitWrapper.Static.LinuxX64"
+      Version="1.0.0" />
+    <PackageReference Include="Chris82111.GitManager.GitWrapper.Static.WindowsX64"
+      Version="1.0.0" />
+    <PackageReference Include="Chris82111.GitManager.GitWrapper.Core"
+      Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

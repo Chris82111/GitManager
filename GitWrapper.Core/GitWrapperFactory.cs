@@ -91,7 +91,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <br/>   <inheritdoc cref="IGitWrapper.Identifier" path="/summary/node()"/>
         /// </summary>
         /// <returns>List of identifier string</returns>
-        public static List<string> Registerd()
+        public static List<string> Registered()
         {
             return _creators.Keys.ToList();
         }
@@ -125,7 +125,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         ///         Creates a new class based on the specified platform.
         /// </summary>
         /// <param name="gitType">Defines the behavior of the function; <see cref="GitType"/></param>
-        /// <returns>Returns an iterface to use all wrapper classes</returns>
+        /// <returns>Returns an interface to use all wrapper classes</returns>
         /// <exception cref="InvalidOperationException"></exception>
         public static IGitWrapper Create(GitType gitType = GitType.Auto)
         {

@@ -82,8 +82,6 @@
   <Target Name="GitLinuxBuildCleanup"
     AfterTargets="GitLinuxBuild"
     Condition="Exists('$(GitLinuxArchiveFileRelative)')" >
-    
-    <Message Text="Git Linux  : Cleanup" Importance="high" />
       
     <!-- Removes the file -->
     <Delete
@@ -105,7 +103,7 @@
   </Target>
   
   <Target Name="GitLinuxGeneratePath" 
-    BeforeTargets="BeforeCompile;Pack"
+    BeforeTargets="CoreCompile;Pack"
     Inputs="$(GitLinuxLibRelative)"
     Outputs="$(ArchivePathsFileRelative)" >
     
@@ -141,6 +139,11 @@ namespace Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_")).Lib
     }
 }
 ' />
+  
+  <ItemGroup>
+    <Compile Remove="$(ArchivePathsFileRelative)" />
+    <Compile Include="$(ArchivePathsFileRelative)" />
+  </ItemGroup>
   
   </Target>
 

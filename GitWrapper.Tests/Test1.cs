@@ -11,7 +11,7 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
     {
         public TestContext TestContext { get; set; } = null!;
         public TestContext Console { get => TestContext; set => TestContext = value; }
-        const string RepositoryName = "LibCsharpStaticGitCollection";
+        const string RepositoryName = "GitManager";
 
         [TestMethod]
         public void Test_01_CreateTypesDirect()
@@ -50,6 +50,8 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
 
         private static void RemoveExtracted(DirectoryInfo directory)
         {
+            Directory.CreateDirectory(directory.FullName);
+
             foreach (var file in Directory.EnumerateFiles(
                 directory.FullName,
                 "*",
@@ -241,9 +243,9 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
             IGitWrapper git;
             string version1, version2;
 
-            var registerd = GitWrapperFactory.Registerd();
+            var registered = GitWrapperFactory.Registered();
 
-            foreach(var identifier in registerd)
+            foreach(var identifier in registered)
             {
                 git = GitWrapperFactory.Create(identifier);
 
@@ -266,9 +268,9 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
             IGitWrapper git;
             string version1, version2;
 
-            var registerd = GitWrapperFactory.Registerd();
+            var registered = GitWrapperFactory.Registered();
 
-            foreach (var identifier in registerd)
+            foreach (var identifier in registered)
             {
                 git = GitWrapperFactory.Create(identifier);
 
@@ -305,8 +307,8 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
             Assert.AreEqual("", result.StandardOutput);
             Assert.AreEqual($"Cloning into '{RepositoryName}'...", result.StandardError);
 
-            var onefile = new FileInfo(Path.Combine(directory.FullName, "README.md"));
-            Assert.IsTrue(onefile.Exists);
+            var oneFile = new FileInfo(Path.Combine(directory.FullName, "README.md"));
+            Assert.IsTrue(oneFile.Exists);
 
             foreach (var file in Directory.EnumerateFiles(
                 directory.FullName,
@@ -339,8 +341,8 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
             Assert.AreEqual("", result.StandardOutput);
             Assert.AreEqual($"Cloning into '{RepositoryName}'...", result.StandardError);
 
-            var onefile = new FileInfo(Path.Combine(directory.FullName, "README.md"));
-            Assert.IsTrue(onefile.Exists);
+            var oneFile = new FileInfo(Path.Combine(directory.FullName, "README.md"));
+            Assert.IsTrue(oneFile.Exists);
 
             foreach (var file in Directory.EnumerateFiles(
                 directory.FullName,
@@ -381,6 +383,13 @@ namespace Chris82111.GitManager.GitWrapper.TestReference
         [TestMethod]
         public void Test_Example2()
         {
+            // Required only for the test project. The system is specifically configured
+            // so that an exception is always triggered when a different system is used.
+            if (GitWrapperWindowsX64.ClassIdentifier != GitWrapper.Core.Helpers.RuntimeHelper.Identifier)
+            {
+                return;
+            }
+
             var git = new GitWrapperWindowsX64();
 
             git.ExtractArchive();

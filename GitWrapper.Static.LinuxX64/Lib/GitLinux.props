@@ -51,7 +51,7 @@
     <!-- runtimes/linux-x64/native/GitLinux.tar.gz -->
     <GitLinuxArchiveFileRelative>$([System.IO.Path]::Combine('$(GitLinuxRuntimeDirectory)', '$(GitLinuxArchiveFile)'))</GitLinuxArchiveFileRelative>
     
-    <!-- C:/Users/Chris82111/source/repos/LibCsharpStaticGitCollection/LibCsharpStaticGitCollection/Lib -->
+    <!-- C:/Users/Chris82111/source/repos/GitManager/GitWrapper.Static.LinuxX64/Lib -->
     <GitLinuxLibDirectoryFull>$(MSBuildThisFileDirectory.TrimEnd('/').TrimEnd('\'))</GitLinuxLibDirectoryFull>
     
     <!-- Lib -->
