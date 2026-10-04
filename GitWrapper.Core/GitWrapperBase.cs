@@ -14,11 +14,6 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <inheritdoc/>
         public string Directory { get; set; } = ".";
 
-        /// <summary>
-        /// Directory of *.dll and *.exe files
-        /// </summary>
-        protected static string BaseDirectory { get; } = AppDomain.CurrentDomain.BaseDirectory;
-
         /// <inheritdoc/>
         public virtual string ExtractDirectory { get; set; } = ".bin";
 
@@ -33,6 +28,13 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 return RuntimeHelper.Identifier == Identifier || "default" == Identifier;
             }
         }
+
+        /// <summary>
+        /// Directory of *.dll and *.exe files
+        /// </summary>
+        protected static string BaseDirectory { get; } = AppDomain.CurrentDomain.BaseDirectory;
+
+        protected Action<ProcessStartInfo>? ConfigureProcessStartInfo { get; set; }
 
         /// <inheritdoc/>
         public virtual void EnsureSupported()
@@ -113,6 +115,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
 
             psi.Environment["GIT_ASKPASS"] = "echo";
 
+            ConfigureProcessStartInfo?.Invoke(psi);
+
             var process = new Process { StartInfo = psi };
 
             if (null == process)
@@ -163,6 +167,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
             };
 
             psi.Environment["GIT_ASKPASS"] = "echo";
+
+            ConfigureProcessStartInfo?.Invoke(psi);
 
             var process = new Process { StartInfo = psi };
 

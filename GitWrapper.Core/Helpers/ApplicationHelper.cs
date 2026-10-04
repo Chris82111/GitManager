@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Chris82111.GitManager.GitWrapper.Core.Helpers
@@ -38,8 +39,6 @@ namespace Chris82111.GitManager.GitWrapper.Core.Helpers
                 programName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? Path.GetFileNameWithoutExtension(programName)
                     : Path.GetFileName(programName);
-
-                path = EnvironmentVariableHelper.CombineVariable("PATH", path);
             }
 
             var process = new Process
@@ -56,7 +55,8 @@ namespace Chris82111.GitManager.GitWrapper.Core.Helpers
 
             if (false == string.IsNullOrEmpty(path))
             {
-                process.StartInfo.Environment["PATH"] = path;
+                var envVar = new ProcessEnvironmentVariable(process.StartInfo);
+                envVar.Add("PATH", path);
             }
 
             process.Start();
@@ -84,8 +84,6 @@ namespace Chris82111.GitManager.GitWrapper.Core.Helpers
                 programName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? Path.GetFileNameWithoutExtension(programName)
                     : Path.GetFileName(programName);
-
-                path = EnvironmentVariableHelper.CombineVariable("PATH", path);
             }
 
             var process = new Process
@@ -103,7 +101,8 @@ namespace Chris82111.GitManager.GitWrapper.Core.Helpers
 
             if (false == string.IsNullOrEmpty(path))
             {
-                process.StartInfo.Environment["PATH"] = path;
+                var envVar = new ProcessEnvironmentVariable(process.StartInfo);
+                envVar.Add("PATH", path);
             }
 
             process.Start();

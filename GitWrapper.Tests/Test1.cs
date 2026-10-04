@@ -3,7 +3,7 @@ using Chris82111.GitManager.GitWrapper.Static.WindowsX64;
 using Chris82111.GitManager.GitWrapper.Static.LinuxX64;
 using System.Runtime.InteropServices;
 
-namespace Chris82111.GitManager.GitWrapper.TestReference
+namespace Chris82111.GitManager.GitWrapper.Tests
 {
     [TestClass]
     [DoNotParallelize]

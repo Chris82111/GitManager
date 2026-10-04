@@ -1,7 +1,9 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core;
 using Chris82111.GitManager.GitWrapper.Core.Archives;
+using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
 using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using Chris82111.GitManager.GitWrapper.Static.LinuxX64.Lib;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
@@ -49,15 +51,20 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
                     overwriteFiles: true);
             }
 
-            EnvironmentVariableHelper.SetToPahtVariable(Path.Combine(output, "bin"));
+            ConfigureProcessStartInfo = processStartInfo =>
+            {
+                var envVar = new ProcessEnvironmentVariable(processStartInfo);
 
-            Environment.SetEnvironmentVariable("GIT_PREFIX", output);
-            Environment.SetEnvironmentVariable("GIT_EXEC_PATH", Path.Combine(output, "libexec", "git-core"));
-            Environment.SetEnvironmentVariable("GIT_TEMPLATE_DIR", Path.Combine(output, "share", "git-core", "templates"));
-            Environment.SetEnvironmentVariable("GIT_SSL_CAINFO", Path.Combine(output, "ca", "ca.pem"));
+                envVar.Add("PATH", Path.Combine(output, "bin"));
 
-            EnvironmentVariableHelper.AddToVariable("LD_LIBRARY_PATH", Path.Combine(output, "openssl", "lib64"));
-            EnvironmentVariableHelper.AddToVariable("LD_LIBRARY_PATH", Path.Combine(output, "curl", "lib"));
+                envVar.Set("GIT_PREFIX", output);
+                envVar.Set("GIT_EXEC_PATH", Path.Combine(output, "libexec", "git-core"));
+                envVar.Set("GIT_TEMPLATE_DIR", Path.Combine(output, "share", "git-core", "templates"));
+                envVar.Set("GIT_SSL_CAINFO", Path.Combine(output, "ca", "ca.pem"));
+
+                envVar.AddOrSet("LD_LIBRARY_PATH", Path.Combine(output, "openssl", "lib64"));
+                envVar.Add("LD_LIBRARY_PATH", Path.Combine(output, "curl", "lib"));
+            };
 
             AppName = PathHelper.ReplacePathSeparatorsOnly(
                 Path.Combine(output, ArchivePaths.ExecutableRelative));
