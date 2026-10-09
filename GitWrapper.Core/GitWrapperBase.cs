@@ -34,6 +34,10 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// </summary>
         protected static string BaseDirectory { get; } = AppDomain.CurrentDomain.BaseDirectory;
 
+        /// <summary>
+        ///         Action that is called after a new instance of the <see cref="ProcessStartInfo"/> class has been created
+        /// <br/>   This action can be used to set environment variables.
+        /// </summary>
         protected Action<ProcessStartInfo>? ConfigureProcessStartInfo { get; set; }
 
         /// <inheritdoc/>

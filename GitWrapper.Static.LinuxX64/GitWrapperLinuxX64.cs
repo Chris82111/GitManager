@@ -62,7 +62,7 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
                 envVar.Set("GIT_TEMPLATE_DIR", Path.Combine(output, "share", "git-core", "templates"));
                 envVar.Set("GIT_SSL_CAINFO", Path.Combine(output, "ca", "ca.pem"));
 
-                envVar.AddOrSet("LD_LIBRARY_PATH", Path.Combine(output, "openssl", "lib64"));
+                envVar.Add("LD_LIBRARY_PATH", Path.Combine(output, "openssl", "lib64"));
                 envVar.Add("LD_LIBRARY_PATH", Path.Combine(output, "curl", "lib"));
             };
 
