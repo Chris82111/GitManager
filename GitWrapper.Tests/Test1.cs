@@ -358,11 +358,13 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_06_ProcesFileNameUsingHostsPathVariable()
         {
-            var git = new GitWrapperWindowsX64();
-
-            var version1 = git.Execute("git", "-v").StandardOutput;
             string versionBefore;
             string versionAfter;
+
+            var git = GitWrapperFactory.Create();
+
+
+            var version1 = git.Execute("git", "-v").StandardOutput;
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
@@ -377,8 +379,10 @@ namespace Chris82111.GitManager.GitWrapper.Tests
                 throw new PlatformNotSupportedException();
             }
 
+
             git.ExtractArchive();
             
+
             var version2 = git.Execute("git", "-v").StandardOutput;
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
