@@ -62,7 +62,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Helpers
 
             // Now attempt to create a symlink to a nonexistent target
 
-#pragma warning disable CA1416 // Methode does have an runtime check
+#pragma warning disable CA1416 // Method does have an runtime check
             int result = Symlink("symlink_test_target_nonexistent", linkPath);
 #pragma warning restore CA1416
 

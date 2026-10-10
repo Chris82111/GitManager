@@ -21,10 +21,11 @@ namespace Chris82111.GitManager.GitWrapper.Core.Helpers
         }
 
         /// <summary>
-        /// Changes the path separators to the system's default separator
+        /// Changes the path separators to the system's default separator and trims a path separator appended at the end
         /// </summary>
         /// <param name="path">The input path</param>
         /// <returns>The path with the system's default separator</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         [return: NotNullIfNotNull(nameof(path))]
         public static string? ReplacePathSeparatorsOnly(string? path)
         {
@@ -33,10 +34,16 @@ namespace Chris82111.GitManager.GitWrapper.Core.Helpers
                 return path;
             }
 
-            return path.Replace(
-                Path.AltDirectorySeparatorChar,
-                Path.DirectorySeparatorChar);
-        }
+            switch (Path.DirectorySeparatorChar)
+            {
+                case '\\':
+                    return path.Replace('/', '\\').TrimEnd('\\');
+                case '/':
+                    return path.Replace('\\', '/').TrimEnd('/');
+                default:
+                    throw new ArgumentOutOfRangeException($"Only '/' and '\\' are allowed for '{nameof(Path.DirectorySeparatorChar)}'");
+            }
+        }        
 
         /// <summary>
         /// Checks whether the path ends with the file extension

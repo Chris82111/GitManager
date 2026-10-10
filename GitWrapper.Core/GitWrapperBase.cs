@@ -14,11 +14,6 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <inheritdoc/>
         public string Directory { get; set; } = ".";
 
-        /// <summary>
-        /// Directory of *.dll and *.exe files
-        /// </summary>
-        protected static string BaseDirectory { get; } = AppDomain.CurrentDomain.BaseDirectory;
-
         /// <inheritdoc/>
         public virtual string ExtractDirectory { get; set; } = ".bin";
 
@@ -33,6 +28,17 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 return RuntimeHelper.Identifier == Identifier || "default" == Identifier;
             }
         }
+
+        /// <summary>
+        /// Directory of *.dll and *.exe files
+        /// </summary>
+        protected static string BaseDirectory { get; } = AppDomain.CurrentDomain.BaseDirectory;
+
+        /// <summary>
+        ///         Action that is called after a new instance of the <see cref="ProcessStartInfo"/> class has been created
+        /// <br/>   This action can be used to set environment variables.
+        /// </summary>
+        protected Action<ProcessStartInfo>? ConfigureProcessStartInfo { get; set; }
 
         /// <inheritdoc/>
         public virtual void EnsureSupported()
@@ -113,6 +119,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
 
             psi.Environment["GIT_ASKPASS"] = "echo";
 
+            ConfigureProcessStartInfo?.Invoke(psi);
+
             var process = new Process { StartInfo = psi };
 
             if (null == process)
@@ -163,6 +171,100 @@ namespace Chris82111.GitManager.GitWrapper.Core
             };
 
             psi.Environment["GIT_ASKPASS"] = "echo";
+
+            ConfigureProcessStartInfo?.Invoke(psi);
+
+            var process = new Process { StartInfo = psi };
+
+            if (null == process)
+            {
+                return processResults;
+            }
+
+            process.Start();
+            
+            processResults.StandardOutput = (await process.StandardOutput.ReadToEndAsync()).TrimEnd('\n').TrimEnd('\r');
+            processResults.StandardError = (await process.StandardError.ReadToEndAsync()).TrimEnd('\n').TrimEnd('\r');
+
+            await process.WaitForExitAsync();
+
+            processResults.ExitCode = process.ExitCode;
+
+            return processResults;
+        }
+
+        /// <inheritdoc/>
+        public virtual ProcessResultsDto Execute(string fileName, string parameter, string? directory = null)
+        {
+            EnsureSupported();
+
+            var processResults = new ProcessResultsDto();
+
+            if (string.IsNullOrEmpty(directory))
+            {
+                directory = Directory;
+            }
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = fileName,
+                Arguments = parameter,
+                WorkingDirectory = directory,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            psi.Environment["GIT_ASKPASS"] = "echo";
+
+            ConfigureProcessStartInfo?.Invoke(psi);
+
+            var process = new Process { StartInfo = psi };
+
+            if (null == process)
+            {
+                return processResults;
+            }
+
+            process.Start();
+
+            processResults.StandardOutput = process.StandardOutput.ReadToEnd().TrimEnd('\n').TrimEnd('\r');
+            processResults.StandardError = process.StandardError.ReadToEnd().TrimEnd('\n').TrimEnd('\r');
+
+            process.WaitForExit();
+
+            processResults.ExitCode = process.ExitCode;
+
+            return processResults;
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task<ProcessResultsDto> ExecuteAsync(string fileName, string parameter, string? directory = null)
+        {
+            EnsureSupported();
+
+            var processResults = new ProcessResultsDto();
+
+            if (string.IsNullOrEmpty(directory))
+            {
+                directory = Directory;
+            }
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = fileName,
+                Arguments = parameter,
+                WorkingDirectory = directory,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            psi.Environment["GIT_ASKPASS"] = "echo";
+
+            ConfigureProcessStartInfo?.Invoke(psi);
 
             var process = new Process { StartInfo = psi };
 

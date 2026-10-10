@@ -92,6 +92,42 @@
         Task<ProcessResultsDto> GitAsync(string parameter, string? directory = null);
 
         /// <summary>
+        ///         Unlike <see cref="Git(string, string?)"/>, this executes a command
+        /// <br/>   for which the application itself can be specified. If <see cref="AppName"/>
+        /// <br/>   is used, it functions the same as <see cref="Git(string, string?)"/>.
+        /// <br/>
+        /// <br/>   Consider using these:
+        /// <br/>   - <see cref="AppName"/> property or
+        /// <br/>   - <see cref="Git(string, string?)"/> method
+        /// </summary>
+        /// <param name="fileName">
+        ///         The application or document to start
+        /// <br/>
+        /// <br/>   <b>Attention</b>: Process- and platform-specific rules are used to resolve the path.
+        /// <br/>   See: <see cref="Execute(string, string, string?)"/></param>
+        /// <param name="parameter">Command-line arguments to use when starting the application</param>
+        /// <param name="directory">Working directory for the process to be started</param>
+        /// <returns>Returns information about the process</returns>
+        /// <remarks>
+        ///         <strong> Warning: </strong>
+        /// <br/>   On Unix-like and Windows systems, .NET's process-start implementation resolves
+        /// <br/>   executable names using the process environment and platform-specific rules.
+        /// <br/>   If <paramref name="fileName"/> is set to "git", the system's native Git is used.
+        /// <br/>   However, the program that is launched recognizes the modified environment
+        /// <br/>   variables. If the started program/script or something else calls "git", for example,
+        /// <br/>   the program is resolved and launched based on the modified process environment and
+        /// <br/>   platform-specific rules. So here the wrapper's Git is used:
+        /// <br/>   
+        /// <br/>   Linux:   <br/><c>Execute("/bin/bash", "-c \"git -v\"")</c>
+        /// <br/>
+        /// <br/>   Windows: <br/><c>Execute("cmd.exe", "/c \"git -v\"")</c>
+        /// </remarks>
+        ProcessResultsDto Execute(string fileName, string parameter, string? directory = null);
+
+        /// <inheritdoc cref="Execute"/>
+        Task<ProcessResultsDto> ExecuteAsync(string fileName, string parameter, string? directory = null);
+
+        /// <summary>
         ///         Checks various sources of the archive, defines paths,
         /// <br/>   and unpacks the archive depending on the system.
         /// <br/>
