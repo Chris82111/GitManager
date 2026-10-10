@@ -15,7 +15,7 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
         /// <inheritdoc/>
         public override string AppName { get; protected set; } = "";
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="GitWrapperBase.Identifier"/>
         public static string ClassIdentifier { get; } = $"{OSPlatform.Windows}-{Architecture.X64}";
 
         /// <inheritdoc/>

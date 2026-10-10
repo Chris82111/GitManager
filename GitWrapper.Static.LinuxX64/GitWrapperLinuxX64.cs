@@ -3,7 +3,6 @@ using Chris82111.GitManager.GitWrapper.Core.Archives;
 using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
 using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using Chris82111.GitManager.GitWrapper.Static.LinuxX64.Lib;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
@@ -16,7 +15,7 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
         /// <inheritdoc/>
         public override string AppName { get; protected set; } = "";
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="GitWrapperBase.Identifier"/>
         public static string ClassIdentifier { get; } = $"{OSPlatform.Linux}-{Architecture.X64}";
 
         /// <inheritdoc/>
