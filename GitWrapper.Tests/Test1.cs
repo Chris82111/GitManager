@@ -355,6 +355,49 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             Directory.Delete(directory.FullName, recursive: true);
         }
 
+        [TestMethod]
+        public void Test_06_ProcesFileNameUsingHostsPathVariable()
+        {
+            var git = new GitWrapperWindowsX64();
+
+            var version1 = git.Execute("git", "-v").StandardOutput;
+            string versionBefore;
+            string versionAfter;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                versionBefore = git.Execute("/bin/bash", "-c \"git -v\"").StandardOutput;
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                versionBefore = git.Execute("cmd.exe", "/c \"git -v\"").StandardOutput;
+            }
+            else
+            {
+                throw new PlatformNotSupportedException();
+            }
+
+            git.ExtractArchive();
+            
+            var version2 = git.Execute("git", "-v").StandardOutput;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                versionAfter = git.Execute("/bin/bash", "-c \"git -v\"").StandardOutput;
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                versionAfter = git.Execute("cmd.exe", "/c \"git -v\"").StandardOutput;
+            }
+
+            Assert.AreEqual(version1, versionBefore);
+            Assert.AreEqual(version1, version2);
+
+            // No test, since it cannot be guaranteed that the system version will
+            // always be different from or older than the version of the static wrapper.
+        }
+
 #pragma warning disable IDE0059 // Unnecessary assignment of a value, but this is an example
 
         [TestMethod]

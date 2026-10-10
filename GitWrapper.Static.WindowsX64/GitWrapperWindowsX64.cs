@@ -1,5 +1,6 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core;
 using Chris82111.GitManager.GitWrapper.Core.Archives;
+using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
 using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using Chris82111.GitManager.GitWrapper.Static.WindowsX64.Lib;
 using System.Runtime.InteropServices;
@@ -46,6 +47,13 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
                     output,
                     overwriteFiles: true);
             }
+
+            ConfigureProcessStartInfo = processStartInfo =>
+            {
+                var envVar = new ProcessEnvironmentVariable(processStartInfo);
+
+                envVar.Add("PATH", Path.Combine(output, "cmd"));
+            };
 
             AppName = PathHelper.ReplacePathSeparatorsOnly(
                 Path.Combine(output, ArchivePaths.ExecutableRelative));
