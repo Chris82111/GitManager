@@ -18,6 +18,9 @@ namespace Chris82111.GitManager.GitWrapper.Core
         public virtual string ExtractDirectory { get; set; } = ".bin";
 
         /// <inheritdoc/>
+        public virtual string? ExtractDirectoryPath { get; protected set; } = null;
+
+        /// <inheritdoc/>
         public abstract string Identifier { get; }
 
         /// <inheritdoc/>

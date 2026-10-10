@@ -50,11 +50,13 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
                     overwriteFiles: true);
             }
 
+            ExtractDirectoryPath = Path.Combine(output, "bin");
+
             ConfigureProcessStartInfo = processStartInfo =>
             {
                 var envVar = new ProcessEnvironmentVariable(processStartInfo);
 
-                envVar.Add("PATH", Path.Combine(output, "bin"));
+                envVar.Add("PATH", ExtractDirectoryPath);
 
                 envVar.Set("GIT_PREFIX", output);
                 envVar.Set("GIT_EXEC_PATH", Path.Combine(output, "libexec", "git-core"));

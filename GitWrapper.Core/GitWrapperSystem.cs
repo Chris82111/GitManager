@@ -10,7 +10,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <inheritdoc/>
         public override string AppName { get; protected set; } = "git";
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="GitWrapperBase.Identifier"/>
         public static string ClassIdentifier { get; } = "default";
 
         /// <inheritdoc/>

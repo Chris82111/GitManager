@@ -25,6 +25,12 @@
         string ExtractDirectory { get; set; }
 
         /// <summary>
+        ///         After extraction (see <see cref="ExtractArchive(string?)"/> and <see cref="ExtractArchiveAsync(string?)"/>),
+        /// <br/>   it contains the path to the binary file, which can be added to the "PATH" system variable.
+        /// </summary>
+        string? ExtractDirectoryPath { get; }
+
+        /// <summary>
         ///         An identifier string consisting of the operating system platform and the
         /// <br/>   architecture, separated by a hyphen ("-").
         /// </summary>

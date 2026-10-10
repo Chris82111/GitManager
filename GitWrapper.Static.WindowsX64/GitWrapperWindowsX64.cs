@@ -48,11 +48,13 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
                     overwriteFiles: true);
             }
 
+            ExtractDirectoryPath = Path.Combine(output, "cmd");
+
             ConfigureProcessStartInfo = processStartInfo =>
             {
                 var envVar = new ProcessEnvironmentVariable(processStartInfo);
 
-                envVar.Add("PATH", Path.Combine(output, "cmd"));
+                envVar.Add("PATH", ExtractDirectoryPath);
             };
 
             AppName = PathHelper.ReplacePathSeparatorsOnly(
