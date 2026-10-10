@@ -41,7 +41,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Helpers
                 case '/':
                     return path.Replace('\\', '/').TrimEnd('/');
                 default:
-                    throw new ArgumentOutOfRangeException($"Only '/' and '\\' are allowed for '{nameof(Path.DirectorySeparatorChar)}'");
+                    throw new ArgumentOutOfRangeException(nameof(path), $"Only '/' and '\\' are allowed for '{nameof(Path.DirectorySeparatorChar)}'");
             }
         }        
 
