@@ -395,14 +395,14 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <br/>   The full path of the file is set here:
         /// <br/>   <see cref="AppName"/>
         /// </summary>
-        /// <param name="destination">The target specified by the user via parameters of the <see cref="ExtractArchive(string?)"/> or <see cref="ExtractArchiveAsync(string?)"/> methods.</param>
+        /// <param name="destination">The target specified by the user via parameters of the <see cref="ExtractArchive(string?, bool)"/> or <see cref="ExtractArchiveAsync(string?, bool)"/> methods.</param>
         /// <param name="archiveFileRelative">Relative path to and including the archive</param>
         /// <param name="binaryFileRelative">Relative path to and including the binary</param>
         [MemberNotNull(nameof(ArchiveFile))]
         [MemberNotNull(nameof(RuntimeDirectory))]
         [MemberNotNull(nameof(BinaryDirectory))]
         [MemberNotNull(nameof(AppName))]
-        protected void InitialisingThePaths(string? destination, string archiveFileRelative, string binaryFileRelative)
+        protected void InitializingPaths(string? destination, string archiveFileRelative, string binaryFileRelative)
         {
             archiveFileRelative = PathHelper.ReplacePathSeparatorsOnly(archiveFileRelative);
             binaryFileRelative = PathHelper.ReplacePathSeparatorsOnly(binaryFileRelative);

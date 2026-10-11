@@ -30,7 +30,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <summary>
         ///         The platform-specific archive contains the static Git
         /// <br/>
-        /// <br/>   The functions <see cref="ExtractArchive(string?)"/> and <see cref="ExtractArchiveAsync(string?)"/>
+        /// <br/>   The functions <see cref="ExtractArchive(string?, bool)"/> and <see cref="ExtractArchiveAsync(string?, bool)"/>
         /// <br/>   are using this archive to extract the system-specific binaries.
         /// </summary>
         string? ArchiveFile { get; }
@@ -38,7 +38,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <summary>
         ///         The platform-specific directory containing the extracted runtime files
         /// <br/>
-        /// <br/>   The functions <see cref="ExtractArchive(string?)"/> and <see cref="ExtractArchiveAsync(string?)"/>
+        /// <br/>   The functions <see cref="ExtractArchive(string?, bool)"/> and <see cref="ExtractArchiveAsync(string?, bool)"/>
         /// <br/>   extract the system-specific binaries to this directory.
         /// </summary>
         string? RuntimeDirectory { get; }
@@ -46,7 +46,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <summary>
         ///         The directory containing the executable binaries, such as git.exe
         /// <br/>
-        /// <br/>   After extraction (see <see cref="ExtractArchive(string?)"/> and <see cref="ExtractArchiveAsync(string?)"/>),
+        /// <br/>   After extraction (see <see cref="ExtractArchive(string?, bool)"/> and <see cref="ExtractArchiveAsync(string?, bool)"/>),
         /// <br/>   it contains the path to the binary file, which can be added to the "PATH" system variable.
         /// </summary>
         string? BinaryDirectory { get; }

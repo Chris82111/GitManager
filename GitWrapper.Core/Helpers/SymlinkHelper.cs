@@ -12,7 +12,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Helpers
         /// Creates a symbolic link at the specified path that points to the specified target.
         /// </summary>
         /// <param name="target">The path of the file or directory to which the symbolic link points.</param>
-        /// <param name="linkpath">The path at which to create the symbolic link.</param>
+        /// <param name="linkPath">The path at which to create the symbolic link.</param>
         /// <returns>
         ///         0 if the symbolic link was created successfully; 
         /// <br/>   -1 otherwise
@@ -23,7 +23,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Helpers
             EntryPoint = "symlink",
             SetLastError = true,
             StringMarshalling = StringMarshalling.Utf8)]
-        private static partial int Symlink(string target, string linkpath);
+        private static partial int Symlink(string target, string linkPath);
 
         /// <summary>
         /// Ensures that symbolic links are supported in the specified directory.

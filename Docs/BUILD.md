@@ -15,6 +15,12 @@ The project can be tested using the test project in the repository. The standard
 - `dotnet test`
 - `dotnet test -p:UseNuGetPackages=true`
 
+## Spell Check in Visual Studio Code
+
+Open Code Spell Checker: `>Spell: Open a new cspell REPL Terminal`  
+Start the test with: `check`  
+Select all C# files: `**/*.cs`  
+
 ## Build Settings
 
 There are various ways to disable individual functions during the build:

@@ -26,7 +26,7 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
         {
             EnsureSupported();
 
-            InitialisingThePaths(
+            InitializingPaths(
                 destination,
                 ArchivePaths.ArchiveFileRelative,
                 ArchivePaths.ExecutableRelative);

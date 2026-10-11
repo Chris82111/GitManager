@@ -357,7 +357,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         }
 
         [TestMethod]
-        public void Test_06_ProcesFileNameUsingHostsPathVariable()
+        public void Test_06_ProcessFileNameUsingHostsPathVariable()
         {
             string versionBefore;
             string versionAfter;

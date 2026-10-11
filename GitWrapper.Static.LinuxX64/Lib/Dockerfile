@@ -123,7 +123,7 @@ RUN make install
 # License information
 RUN cp /build/zlib/LICENSE /opt/zlib/LICENSE
 
-# Ensure ouput is static
+# Ensure output is static
 RUN \
   if ldd /opt/zlib/lib/libz.a >/dev/null 2>&1; then \
     echo "ERROR: libz.a is dynamically linked"; exit 1; \
@@ -165,7 +165,7 @@ RUN make install_sw
 # License information
 RUN cp /build/openssl/LICENSE.txt /opt/openssl/LICENSE.txt
 
-# Ensure ouput is static
+# Ensure output is static
 RUN \
   if ldd /opt/openssl/lib64/libcrypto.a >/dev/null 2>&1; then \
     echo "ERROR: libcrypto.a is dynamically linked"; exit 1; \
@@ -176,7 +176,7 @@ RUN \
     echo "ERROR: libssl.a is dynamically linked"; exit 1; \
   fi
 
-# Ensure ouput is dynamic
+# Ensure output is dynamic
 RUN \
   if ! readelf -d /opt/openssl/lib64/libcrypto.so >/dev/null 2>&1; then \
     echo "ERROR: libcrypto.so is NOT dynamically linked"; exit 1; \
@@ -282,7 +282,7 @@ RUN make install
 # License information
 RUN cp /build/libpsl/LICENSE /opt/libpsl/LICENSE
 
-# Ensure ouput is static
+# Ensure output is static
 RUN \
   if ldd /opt/libpsl/lib/libpsl.a >/dev/null 2>&1; then \
     echo "ERROR: libpsl.a is dynamically linked"; exit 1; \
@@ -336,7 +336,7 @@ RUN ./configure \
 RUN make
 RUN make install
 
-# Ensure ouput is static
+# Ensure output is static
 RUN \
   if ldd /opt/curl/lib/libcurl.a >/dev/null 2>&1; then \
     echo "ERROR: libcurl.a is dynamically linked"; exit 1; \
