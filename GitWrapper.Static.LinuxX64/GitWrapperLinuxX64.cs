@@ -22,7 +22,7 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
         public override string Identifier { get; } = ClassIdentifier;
 
         /// <inheritdoc/>
-        public override async Task ExtractArchiveAsync(string? destination = null)
+        public override async Task ExtractArchiveAsync(string? destination = null, bool clearBeforeExtract = false)
         {
             EnsureSupported();
 
@@ -30,6 +30,11 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
                 destination,
                 ArchivePaths.ArchiveFileRelative,
                 ArchivePaths.ExecutableRelative);
+
+            if (clearBeforeExtract)
+            {
+                await RemoveExtractedAsync();
+            }
 
             if (PathHelper.IsDirectoryMissingOrEmpty(RuntimeDirectory))
             {

@@ -296,20 +296,20 @@ namespace Chris82111.GitManager.GitWrapper.Core
         }
 
         /// <inheritdoc/>
-        public virtual void ExtractArchive(string? destination = null)
+        public virtual void ExtractArchive(string? destination = null, bool clearBeforeExtract = false)
         {
             // Every Extract function must implement EnsureSupported.
             // Since the Asynchronous function is called here, this
             // is omitted to avoid a duplicate call.
             // EnsureSupported();
 
-            ExtractArchiveAsync(destination)
+            ExtractArchiveAsync(destination, clearBeforeExtract)
                 .GetAwaiter()
                 .GetResult();
         }
 
         /// <inheritdoc/>
-        public virtual async Task ExtractArchiveAsync(string? destination = null)
+        public virtual async Task ExtractArchiveAsync(string? destination = null, bool clearBeforeExtract = false)
         {
             EnsureSupported();
         }
@@ -324,7 +324,6 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 return;
             }
 
-            //var runtimeDirectory = System.IO.Directory.GetParent(RuntimeDirectory)!.FullName;
             var runtimeDirectory = RuntimeDirectory;
 
             System.IO.Directory.CreateDirectory(runtimeDirectory);
@@ -355,7 +354,6 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 return;
             }
 
-            //var runtimeDirectory = System.IO.Directory.GetParent(RuntimeDirectory)!.FullName;
             var runtimeDirectory = RuntimeDirectory;
 
             System.IO.Directory.CreateDirectory(runtimeDirectory);

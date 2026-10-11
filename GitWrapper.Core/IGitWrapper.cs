@@ -161,12 +161,13 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <br/>   Must be called before using other functions.
         /// </summary>
         /// <param name="destination">Output path to which the archive is extracted</param>
+        /// <param name="clearBeforeExtract">If this option is selected, the extraction directory is explicitly cleared before extraction takes place</param>
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="Exception"></exception>
-        void ExtractArchive(string? destination = null);
+        void ExtractArchive(string? destination = null, bool clearBeforeExtract = false);
 
         /// <inheritdoc cref="ExtractArchive"/>
-        Task ExtractArchiveAsync(string? destination = null);
+        Task ExtractArchiveAsync(string? destination = null, bool clearBeforeExtract = false);
 
         /// <summary>
         /// Removes the runtime directory
