@@ -1,5 +1,6 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Chris82111.GitManager.GitWrapper.Core
 {
@@ -18,7 +19,19 @@ namespace Chris82111.GitManager.GitWrapper.Core
         public virtual string ExtractDirectory { get; set; } = ".bin";
 
         /// <inheritdoc/>
+        public string? ArchiveFile { get; protected set; } = null;
+
+        /// <inheritdoc/>
+        public virtual string? RuntimeDirectory { get; protected set; } = null;
+
+        /// <inheritdoc/>
+        public virtual string? BinaryDirectory { get; protected set; } = null;
+
+        /// <inheritdoc/>
         public abstract string Identifier { get; }
+
+        /// <inheritdoc/>
+        public virtual ExtractConditions ExtractConditions { get; set; } = ExtractConditions.IfDirectoryMissingOrEmpty;
 
         /// <inheritdoc/>
         public virtual bool IsSupported
@@ -286,40 +299,218 @@ namespace Chris82111.GitManager.GitWrapper.Core
         }
 
         /// <inheritdoc/>
-        public virtual void ExtractArchive(string? destination = null)
+        public virtual void ExtractArchive(string? destination = null, ExtractConditions? extractConditions = null)
         {
             // Every Extract function must implement EnsureSupported.
             // Since the Asynchronous function is called here, this
             // is omitted to avoid a duplicate call.
             // EnsureSupported();
 
-            ExtractArchiveAsync(destination)
+            ExtractArchiveAsync(destination, extractConditions)
                 .GetAwaiter()
                 .GetResult();
         }
 
         /// <inheritdoc/>
-        public virtual async Task ExtractArchiveAsync(string? destination = null)
+        public virtual async Task ExtractArchiveAsync(string? destination = null, ExtractConditions? extractConditions = null)
         {
             EnsureSupported();
         }
 
-        /// <summary>
-        ///         Determines the output directory into which the archive will be extracted.
-        /// <br/>   This allows individual plugins to determine the path in the same way every time.
-        /// </summary>
-        /// <param name="destination">The target specified by the user via parameters of the <see cref="ExtractArchive(string?)"/> or <see cref="ExtractArchiveAsync(string?)"/> methods.</param>
-        /// <param name="archiveFileRelative">Relative path to and including the archive.</param>
-        /// <returns>Output directory where the archive will be extracted</returns>
-        protected string GetOutputDirectoryForExtract(string? destination, string archiveFileRelative)
+        /// <inheritdoc/>
+        public virtual void RemoveExtracted()
         {
-            var relativeExtractPath = Path.GetDirectoryName(archiveFileRelative)!;
+            EnsureSupported();
+
+            if (null == RuntimeDirectory)
+            {
+                return;
+            }
+
+            var runtimeDirectory = RuntimeDirectory;
+
+            System.IO.Directory.CreateDirectory(runtimeDirectory);
+
+            var files = System.IO.Directory.EnumerateFiles(
+                runtimeDirectory,
+                "*",
+                SearchOption.AllDirectories);
+
+            foreach (var file in files)
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+            }
+
+            System.IO.Directory.Delete(runtimeDirectory, recursive: true);
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task RemoveExtractedAsync(ParallelOptions? parallelOptions = null)
+        {
+            EnsureSupported();
+
+            if (null == RuntimeDirectory)
+            {
+                return;
+            }
+
+            var runtimeDirectory = RuntimeDirectory;
+
+            System.IO.Directory.CreateDirectory(runtimeDirectory);
+
+            var files = System.IO.Directory.EnumerateFiles(
+                runtimeDirectory,
+                "*",
+                SearchOption.AllDirectories);
+
+            await Parallel.ForEachAsync(
+                files,
+                parallelOptions ?? new ParallelOptions(),
+                (file, cancellationToken) =>
+                {
+                    File.SetAttributes(file, FileAttributes.Normal);
+                    return ValueTask.CompletedTask;
+                });
+
+            System.IO.Directory.Delete(runtimeDirectory, recursive: true);
+        }
+
+        /// <summary>
+        ///         Determines the required paths to the directories and the application to be launched.
+        /// <br/>   In this way, all plugins use the same paths.
+        /// <br/>   
+        /// <br/>   The full path of the archive file is set here:
+        /// <br/>   <see cref="ArchiveFile"/>
+        /// <br/>   
+        /// <br/>   Is only changed if the parameter <paramref name="destination"/> is set:
+        /// <br/>   <see cref="ExtractDirectory"/>
+        /// <br/>   
+        /// <br/>   The full path of the directories are set here:
+        /// <br/>   <see cref="RuntimeDirectory"/>
+        /// <br/>   <see cref="BinaryDirectory"/>
+        /// <br/>   
+        /// <br/>   The full path of the file is set here:
+        /// <br/>   <see cref="AppName"/>
+        /// </summary>
+        /// <param name="destination">The target specified by the user via parameters of the <see cref="ExtractArchive(string?, ExtractConditions?)"/> or <see cref="ExtractArchiveAsync(string?, ExtractConditions?)"/> methods.</param>
+        /// <param name="archiveFileRelative">Relative path to and including the archive</param>
+        /// <param name="binaryFileRelative">Relative path to and including the binary</param>
+        [MemberNotNull(nameof(ArchiveFile))]
+        [MemberNotNull(nameof(RuntimeDirectory))]
+        [MemberNotNull(nameof(BinaryDirectory))]
+        [MemberNotNull(nameof(AppName))]
+        protected void InitializingPaths(string? destination, string archiveFileRelative, string binaryFileRelative)
+        {
+            archiveFileRelative = PathHelper.ReplacePathSeparatorsOnly(archiveFileRelative);
+            binaryFileRelative = PathHelper.ReplacePathSeparatorsOnly(binaryFileRelative);
+
+            ArchiveFile = Path.Combine(BaseDirectory, archiveFileRelative);
+
+            var relativeExtractPath = Path.GetDirectoryName(Path.GetDirectoryName(archiveFileRelative)!)!;
+            var relativeBinaryPath = Path.GetDirectoryName(binaryFileRelative)!;
+
+            if (null == destination)
+            {
+                RuntimeDirectory = Path.Combine(BaseDirectory, ExtractDirectory, relativeExtractPath);
+            }
+            else
+            {
+                if (Path.IsPathRooted(destination))
+                {
+                    ExtractDirectory = destination;
+                    RuntimeDirectory = Path.Combine(destination, relativeExtractPath);
+                }
+                else
+                {
+                    ExtractDirectory = Path.Combine(BaseDirectory, destination);
+                    RuntimeDirectory = Path.Combine(ExtractDirectory, relativeExtractPath);
+                }
+            }
+
+            BinaryDirectory = Path.Combine(RuntimeDirectory, relativeBinaryPath);
             
-            return (null == destination)
-                ? Path.Combine(BaseDirectory, ExtractDirectory, relativeExtractPath)
-                : Path.IsPathRooted(destination)
-                    ? Path.Combine(destination, relativeExtractPath)
-                    : Path.Combine(BaseDirectory, destination, relativeExtractPath);
+            AppName = Path.Combine(
+                RuntimeDirectory,
+                binaryFileRelative);
+        }
+
+        /// <summary>
+        ///         Checks whether the runtime directory has been moved and
+        /// <br/>   creates a file to track the movement.
+        /// </summary>
+        /// <returns>
+        ///         true The directory has been moved
+        /// <br/>   false The directory was not moved</returns>
+        protected bool CheckIfMoved()
+        {
+            ArgumentNullException.ThrowIfNull(RuntimeDirectory);
+
+            string file = Path.Combine(RuntimeDirectory, "extractedPath.txt");
+
+            if (false == File.Exists(file))
+            {
+                System.IO.Directory.CreateDirectory(RuntimeDirectory);
+                File.WriteAllText(file, RuntimeDirectory);
+
+                return true;
+            }
+
+            string content = File.ReadAllText(file);
+
+            if (content != RuntimeDirectory)
+            {
+                File.WriteAllText(file, RuntimeDirectory);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        ///         Prepares for extraction, deletes the old extracted data depending on the conditions,
+        /// <br/>   and returns whether the archive needs to be created.
+        /// </summary>
+        /// <param name="extractConditions"></param>
+        /// <returns>
+        ///         true The archive must be extracted
+        /// <br/>   false The archive does not need to be extracted</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        protected async Task<bool> PrepareAndCheckExtractAsync(ExtractConditions? extractConditions = null)
+        {
+            ArgumentNullException.ThrowIfNull(RuntimeDirectory);
+
+            if (null == extractConditions)
+            {
+                extractConditions = ExtractConditions;
+            }
+
+            var extract = true;
+            switch (extractConditions)
+            {
+                case ExtractConditions.IfDirectoryMissingOrEmpty:
+                    extract = PathHelper.IsDirectoryMissingOrEmpty(RuntimeDirectory);
+                    break;
+                
+                case ExtractConditions.AlwaysOverwriteFiles:
+                    break;
+                
+                case ExtractConditions.ClearBeforeExtractIfMoved:
+                    if (CheckIfMoved())
+                    {
+                        await RemoveExtractedAsync();
+                    }
+                    break;
+                
+                case ExtractConditions.ClearBeforeExtract:
+                    await RemoveExtractedAsync();
+                    break;
+                
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(extractConditions));
+            }
+
+            return extract;
         }
     }
 }

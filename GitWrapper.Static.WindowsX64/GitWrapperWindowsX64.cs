@@ -15,36 +15,37 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
         /// <inheritdoc/>
         public override string AppName { get; protected set; } = "";
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="GitWrapperBase.Identifier"/>
         public static string ClassIdentifier { get; } = $"{OSPlatform.Windows}-{Architecture.X64}";
 
         /// <inheritdoc/>
         public override string Identifier { get; } = ClassIdentifier;
 
         /// <inheritdoc/>
-        public override async Task ExtractArchiveAsync(string? destination = null)
+        public override async Task ExtractArchiveAsync(string? destination = null, ExtractConditions? extractConditions = null)
         {
             EnsureSupported();
 
-            var output = GetOutputDirectoryForExtract(destination, ArchivePaths.ArchiveFileRelative);
+            InitializingPaths(
+                destination,
+                ArchivePaths.ArchiveFileRelative,
+                ArchivePaths.ExecutableRelative);
 
-            if (PathHelper.IsDirectoryMissingOrEmpty(output))
+            if (await PrepareAndCheckExtractAsync(extractConditions))
             {
-                var archive = Path.Combine(BaseDirectory, ArchivePaths.ArchiveFileRelative);
-
-                if (false == File.Exists(archive))
+                if (false == File.Exists(ArchiveFile))
                 {
-                    throw new FileNotFoundException($"File was no found: {ArchivePaths.ArchiveFileRelative}");
+                    throw new FileNotFoundException($"File was no found: {ArchiveFile}");
                 }
 
-                if (".zip" != Path.GetExtension(archive))
+                if (".zip" != Path.GetExtension(ArchiveFile))
                 {
                     throw new Exception($"File Extension must be '.zip'");
                 }
             
                 await ArchiveHandler.ExtractZipToDirectoryAsync(
-                    archive,
-                    output,
+                    ArchiveFile,
+                    RuntimeDirectory,
                     overwriteFiles: true);
             }
 
@@ -52,11 +53,8 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
             {
                 var envVar = new ProcessEnvironmentVariable(processStartInfo);
 
-                envVar.Add("PATH", Path.Combine(output, "cmd"));
+                envVar.Add("PATH", BinaryDirectory);
             };
-
-            AppName = PathHelper.ReplacePathSeparatorsOnly(
-                Path.Combine(output, ArchivePaths.ExecutableRelative));
         }
     }
 }

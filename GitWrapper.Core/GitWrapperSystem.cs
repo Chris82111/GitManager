@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Chris82111.GitManager.GitWrapper.Core
+﻿namespace Chris82111.GitManager.GitWrapper.Core
 {
     /// <summary>
     /// The default implementation uses the system's built-in Git installation.
@@ -10,7 +8,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <inheritdoc/>
         public override string AppName { get; protected set; } = "git";
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="GitWrapperBase.Identifier"/>
         public static string ClassIdentifier { get; } = "default";
 
         /// <inheritdoc/>
