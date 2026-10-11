@@ -31,6 +31,9 @@ namespace Chris82111.GitManager.GitWrapper.Core
         public abstract string Identifier { get; }
 
         /// <inheritdoc/>
+        public virtual ExtractConditions ExtractConditions { get; set; } = ExtractConditions.IfDirectoryMissingOrEmpty;
+
+        /// <inheritdoc/>
         public virtual bool IsSupported
         {
             get
@@ -296,20 +299,20 @@ namespace Chris82111.GitManager.GitWrapper.Core
         }
 
         /// <inheritdoc/>
-        public virtual void ExtractArchive(string? destination = null, bool clearBeforeExtract = false)
+        public virtual void ExtractArchive(string? destination = null, ExtractConditions? extractConditions = null)
         {
             // Every Extract function must implement EnsureSupported.
             // Since the Asynchronous function is called here, this
             // is omitted to avoid a duplicate call.
             // EnsureSupported();
 
-            ExtractArchiveAsync(destination, clearBeforeExtract)
+            ExtractArchiveAsync(destination, extractConditions)
                 .GetAwaiter()
                 .GetResult();
         }
 
         /// <inheritdoc/>
-        public virtual async Task ExtractArchiveAsync(string? destination = null, bool clearBeforeExtract = false)
+        public virtual async Task ExtractArchiveAsync(string? destination = null, ExtractConditions? extractConditions = null)
         {
             EnsureSupported();
         }
@@ -339,9 +342,6 @@ namespace Chris82111.GitManager.GitWrapper.Core
             }
 
             System.IO.Directory.Delete(runtimeDirectory, recursive: true);
-
-            RuntimeDirectory = null;
-            BinaryDirectory = null;
         }
 
         /// <inheritdoc/>
@@ -373,9 +373,6 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 });
 
             System.IO.Directory.Delete(runtimeDirectory, recursive: true);
-
-            RuntimeDirectory = null;
-            BinaryDirectory = null;
         }
 
         /// <summary>
@@ -395,7 +392,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <br/>   The full path of the file is set here:
         /// <br/>   <see cref="AppName"/>
         /// </summary>
-        /// <param name="destination">The target specified by the user via parameters of the <see cref="ExtractArchive(string?, bool)"/> or <see cref="ExtractArchiveAsync(string?, bool)"/> methods.</param>
+        /// <param name="destination">The target specified by the user via parameters of the <see cref="ExtractArchive(string?, ExtractConditions?)"/> or <see cref="ExtractArchiveAsync(string?, ExtractConditions?)"/> methods.</param>
         /// <param name="archiveFileRelative">Relative path to and including the archive</param>
         /// <param name="binaryFileRelative">Relative path to and including the binary</param>
         [MemberNotNull(nameof(ArchiveFile))]
@@ -435,6 +432,85 @@ namespace Chris82111.GitManager.GitWrapper.Core
             AppName = Path.Combine(
                 RuntimeDirectory,
                 binaryFileRelative);
+        }
+
+        /// <summary>
+        ///         Checks whether the runtime directory has been moved and
+        /// <br/>   creates a file to track the movement.
+        /// </summary>
+        /// <returns>
+        ///         true The directory has been moved
+        /// <br/>   false The directory was not moved</returns>
+        protected bool CheckIfMoved()
+        {
+            ArgumentNullException.ThrowIfNull(RuntimeDirectory);
+
+            string file = Path.Combine(RuntimeDirectory, "extractedPath.txt");
+
+            if (false == File.Exists(file))
+            {
+                System.IO.Directory.CreateDirectory(RuntimeDirectory);
+                File.WriteAllText(file, RuntimeDirectory);
+
+                return true;
+            }
+
+            string content = File.ReadAllText(file);
+
+            if (content != RuntimeDirectory)
+            {
+                File.WriteAllText(file, RuntimeDirectory);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        ///         Prepares for extraction, deletes the old extracted data depending on the conditions,
+        /// <br/>   and returns whether the archive needs to be created.
+        /// </summary>
+        /// <param name="extractConditions"></param>
+        /// <returns>
+        ///         true The archive must be extracted
+        /// <br/>   false The archive does not need to be extracted</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        protected async Task<bool> PrepareAndCheckExtractAsync(ExtractConditions? extractConditions = null)
+        {
+            ArgumentNullException.ThrowIfNull(RuntimeDirectory);
+
+            if (null == extractConditions)
+            {
+                extractConditions = ExtractConditions;
+            }
+
+            var extract = true;
+            switch (extractConditions)
+            {
+                case ExtractConditions.IfDirectoryMissingOrEmpty:
+                    extract = PathHelper.IsDirectoryMissingOrEmpty(RuntimeDirectory);
+                    break;
+                
+                case ExtractConditions.AlwaysOverwriteFiles:
+                    break;
+                
+                case ExtractConditions.ClearBeforeExtractIfMoved:
+                    if (CheckIfMoved())
+                    {
+                        await RemoveExtractedAsync();
+                    }
+                    break;
+                
+                case ExtractConditions.ClearBeforeExtract:
+                    await RemoveExtractedAsync();
+                    break;
+                
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(extractConditions));
+            }
+
+            return extract;
         }
     }
 }

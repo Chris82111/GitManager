@@ -30,7 +30,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <summary>
         ///         The platform-specific archive contains the static Git
         /// <br/>
-        /// <br/>   The functions <see cref="ExtractArchive(string?, bool)"/> and <see cref="ExtractArchiveAsync(string?, bool)"/>
+        /// <br/>   The functions <see cref="ExtractArchive(string?, ExtractConditions?)"/> and <see cref="ExtractArchiveAsync(string?, ExtractConditions?)"/>
         /// <br/>   are using this archive to extract the system-specific binaries.
         /// </summary>
         string? ArchiveFile { get; }
@@ -38,7 +38,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <summary>
         ///         The platform-specific directory containing the extracted runtime files
         /// <br/>
-        /// <br/>   The functions <see cref="ExtractArchive(string?, bool)"/> and <see cref="ExtractArchiveAsync(string?, bool)"/>
+        /// <br/>   The functions <see cref="ExtractArchive(string?, ExtractConditions?)"/> and <see cref="ExtractArchiveAsync(string?, ExtractConditions?)"/>
         /// <br/>   extract the system-specific binaries to this directory.
         /// </summary>
         string? RuntimeDirectory { get; }
@@ -46,7 +46,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <summary>
         ///         The directory containing the executable binaries, such as git.exe
         /// <br/>
-        /// <br/>   After extraction (see <see cref="ExtractArchive(string?, bool)"/> and <see cref="ExtractArchiveAsync(string?, bool)"/>),
+        /// <br/>   After extraction (see <see cref="ExtractArchive(string?, ExtractConditions?)"/> and <see cref="ExtractArchiveAsync(string?, ExtractConditions?)"/>),
         /// <br/>   it contains the path to the binary file, which can be added to the "PATH" system variable.
         /// </summary>
         string? BinaryDirectory { get; }
@@ -56,6 +56,12 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <br/>   architecture, separated by a hyphen ("-").
         /// </summary>
         string Identifier { get; }
+
+        /// <summary>
+        ///         Sets the default action to be performed when the archive is extracted.
+        /// <br/>   These may vary depending on platform-specific characteristics.
+        /// </summary>
+        ExtractConditions ExtractConditions { get; set; }
 
         /// <summary>
         /// A property that indicates whether the class can be used on the current system.
@@ -161,13 +167,13 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <br/>   Must be called before using other functions.
         /// </summary>
         /// <param name="destination">Output path to which the archive is extracted</param>
-        /// <param name="clearBeforeExtract">If this option is selected, the extraction directory is explicitly cleared before extraction takes place</param>
+        /// <param name="extractConditions">The behavior during extraction can be specifically modified; see <see cref="ExtractConditions"/></param>
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="Exception"></exception>
-        void ExtractArchive(string? destination = null, bool clearBeforeExtract = false);
+        void ExtractArchive(string? destination = null, ExtractConditions? extractConditions = null);
 
         /// <inheritdoc cref="ExtractArchive"/>
-        Task ExtractArchiveAsync(string? destination = null, bool clearBeforeExtract = false);
+        Task ExtractArchiveAsync(string? destination = null, ExtractConditions? extractConditions = null);
 
         /// <summary>
         /// Removes the runtime directory
