@@ -26,39 +26,35 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
         {
             EnsureSupported();
 
-            var output = GetOutputDirectoryForExtract(destination, ArchivePaths.ArchiveFileRelative);
+            InitialisingThePaths(
+                destination,
+                ArchivePaths.ArchiveFileRelative,
+                ArchivePaths.ExecutableRelative);
 
-            if (PathHelper.IsDirectoryMissingOrEmpty(output))
+            if (PathHelper.IsDirectoryMissingOrEmpty(RuntimeDirectory))
             {
-                var archive = Path.Combine(BaseDirectory, ArchivePaths.ArchiveFileRelative);
-
-                if (false == File.Exists(archive))
+                if (false == File.Exists(ArchiveFile))
                 {
-                    throw new FileNotFoundException($"File was no found: {ArchivePaths.ArchiveFileRelative}");
+                    throw new FileNotFoundException($"File was no found: {ArchiveFile}");
                 }
 
-                if (".zip" != Path.GetExtension(archive))
+                if (".zip" != Path.GetExtension(ArchiveFile))
                 {
                     throw new Exception($"File Extension must be '.zip'");
                 }
             
                 await ArchiveHandler.ExtractZipToDirectoryAsync(
-                    archive,
-                    output,
+                    ArchiveFile,
+                    RuntimeDirectory,
                     overwriteFiles: true);
             }
-
-            ExtractDirectoryPath = Path.Combine(output, "cmd");
 
             ConfigureProcessStartInfo = processStartInfo =>
             {
                 var envVar = new ProcessEnvironmentVariable(processStartInfo);
 
-                envVar.Add("PATH", ExtractDirectoryPath);
+                envVar.Add("PATH", BinaryDirectory);
             };
-
-            AppName = PathHelper.ReplacePathSeparatorsOnly(
-                Path.Combine(output, ArchivePaths.ExecutableRelative));
         }
     }
 }

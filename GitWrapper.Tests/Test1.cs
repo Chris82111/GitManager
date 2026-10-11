@@ -1,6 +1,7 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core;
-using Chris82111.GitManager.GitWrapper.Static.WindowsX64;
+using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using Chris82111.GitManager.GitWrapper.Static.LinuxX64;
+using Chris82111.GitManager.GitWrapper.Static.WindowsX64;
 using System.Runtime.InteropServices;
 
 namespace Chris82111.GitManager.GitWrapper.Tests
@@ -385,6 +386,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             var version2 = git.Execute("git", "-v").StandardOutput;
 
+#pragma warning disable IDE0059 // Unnecessary assignment of a value, but this is an example
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 versionAfter = git.Execute("/bin/bash", "-c \"git -v\"").StandardOutput;
@@ -394,12 +396,27 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             {
                 versionAfter = git.Execute("cmd.exe", "/c \"git -v\"").StandardOutput;
             }
+#pragma warning restore IDE0059
 
             Assert.AreEqual(version1, versionBefore);
             Assert.AreEqual(version1, version2);
 
             // No test, since it cannot be guaranteed that the system version will
             // always be different from or older than the version of the static wrapper.
+        }
+
+        [TestMethod]
+        public void Test_07_RemoveExtracted()
+        {
+            var git = GitWrapperFactory.Create();
+            git.ExtractArchive();
+
+            var runtimeDirectory = git.RuntimeDirectory!;
+            Assert.IsFalse(PathHelper.IsDirectoryMissingOrEmpty(runtimeDirectory));
+
+            git.RemoveExtracted();
+
+            Assert.IsTrue(PathHelper.IsDirectoryMissingOrEmpty(runtimeDirectory));
         }
 
 #pragma warning disable IDE0059 // Unnecessary assignment of a value, but this is an example

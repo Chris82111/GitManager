@@ -26,49 +26,45 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
         {
             EnsureSupported();
 
-            var output = GetOutputDirectoryForExtract(destination, ArchivePaths.ArchiveFileRelative);
+            InitialisingThePaths(
+                destination,
+                ArchivePaths.ArchiveFileRelative,
+                ArchivePaths.ExecutableRelative);
 
-            if (PathHelper.IsDirectoryMissingOrEmpty(output))
+            if (PathHelper.IsDirectoryMissingOrEmpty(RuntimeDirectory))
             {
-                var archive = Path.Combine(BaseDirectory, ArchivePaths.ArchiveFileRelative);
-
-                if (false == File.Exists(archive))
+                if (false == File.Exists(ArchiveFile))
                 {
-                    throw new FileNotFoundException($"File was no found: {ArchivePaths.ArchiveFileRelative}");
+                    throw new FileNotFoundException($"File was no found: {ArchiveFile}");
                 }
 
-                if (false == PathHelper.IsExtension(archive, ".tar.gz"))
+                if (false == PathHelper.IsExtension(ArchiveFile, ".tar.gz"))
                 {
                     throw new Exception($"File Extension must be '.tar.gz'");
                 }
 
-                SymlinkHelper.EnsureSymlinkSupported(output);
+                SymlinkHelper.EnsureSymlinkSupported(RuntimeDirectory);
 
                 await ArchiveHandler.ExtractTarGzToDirectoryAsync(
-                    archive,
-                    output,
+                    ArchiveFile,
+                    RuntimeDirectory,
                     overwriteFiles: true);
             }
-
-            ExtractDirectoryPath = Path.Combine(output, "bin");
 
             ConfigureProcessStartInfo = processStartInfo =>
             {
                 var envVar = new ProcessEnvironmentVariable(processStartInfo);
 
-                envVar.Add("PATH", ExtractDirectoryPath);
+                envVar.Add("PATH", BinaryDirectory);
 
-                envVar.Set("GIT_PREFIX", output);
-                envVar.Set("GIT_EXEC_PATH", Path.Combine(output, "libexec", "git-core"));
-                envVar.Set("GIT_TEMPLATE_DIR", Path.Combine(output, "share", "git-core", "templates"));
-                envVar.Set("GIT_SSL_CAINFO", Path.Combine(output, "ca", "ca.pem"));
+                envVar.Set("GIT_PREFIX", RuntimeDirectory);
+                envVar.Set("GIT_EXEC_PATH", Path.Combine(RuntimeDirectory, "libexec", "git-core"));
+                envVar.Set("GIT_TEMPLATE_DIR", Path.Combine(RuntimeDirectory, "share", "git-core", "templates"));
+                envVar.Set("GIT_SSL_CAINFO", Path.Combine(RuntimeDirectory, "ca", "ca.pem"));
 
-                envVar.Add("LD_LIBRARY_PATH", Path.Combine(output, "openssl", "lib64"));
-                envVar.Add("LD_LIBRARY_PATH", Path.Combine(output, "curl", "lib"));
+                envVar.Add("LD_LIBRARY_PATH", Path.Combine(RuntimeDirectory, "openssl", "lib64"));
+                envVar.Add("LD_LIBRARY_PATH", Path.Combine(RuntimeDirectory, "curl", "lib"));
             };
-
-            AppName = PathHelper.ReplacePathSeparatorsOnly(
-                Path.Combine(output, ArchivePaths.ExecutableRelative));
         }
     }
 }

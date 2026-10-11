@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Chris82111.GitManager.GitWrapper.Core
+﻿namespace Chris82111.GitManager.GitWrapper.Core
 {
     /// <summary>
     /// The default implementation uses the system's built-in Git installation.

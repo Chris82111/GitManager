@@ -1,4 +1,7 @@
-﻿namespace Chris82111.GitManager.GitWrapper.Core
+﻿using System.Runtime.InteropServices;
+using static System.Net.WebRequestMethods;
+
+namespace Chris82111.GitManager.GitWrapper.Core
 {
     /// <summary>
     ///         Interface used by the <see cref="GitWrapperBase"/> class and by all system-specific classes.
@@ -18,17 +21,35 @@
         string Directory { get; set; }
 
         /// <summary>
-        ///         The functions <see cref="ExtractArchive(string?)"/> and <see cref="ExtractArchiveAsync(string?)"/>
-        /// <br/>   extract the system-specific binaries to the directory specified here.
+        ///         The root directory where the archives are extracted.
+        /// <br/>   
         /// <br/>   The directory can be changed and specified as either a relative or absolute path.
         /// </summary>
         string ExtractDirectory { get; set; }
 
         /// <summary>
-        ///         After extraction (see <see cref="ExtractArchive(string?)"/> and <see cref="ExtractArchiveAsync(string?)"/>),
+        ///         The platform-specific archive contains the static Git
+        /// <br/>
+        /// <br/>   The functions <see cref="ExtractArchive(string?)"/> and <see cref="ExtractArchiveAsync(string?)"/>
+        /// <br/>   are using this archive to extract the system-specific binaries.
+        /// </summary>
+        string? ArchiveFile { get; }
+
+        /// <summary>
+        ///         The platform-specific directory containing the extracted runtime files
+        /// <br/>
+        /// <br/>   The functions <see cref="ExtractArchive(string?)"/> and <see cref="ExtractArchiveAsync(string?)"/>
+        /// <br/>   extract the system-specific binaries to this directory.
+        /// </summary>
+        string? RuntimeDirectory { get; }
+
+        /// <summary>
+        ///         The directory containing the executable binaries, such as git.exe
+        /// <br/>
+        /// <br/>   After extraction (see <see cref="ExtractArchive(string?)"/> and <see cref="ExtractArchiveAsync(string?)"/>),
         /// <br/>   it contains the path to the binary file, which can be added to the "PATH" system variable.
         /// </summary>
-        string? ExtractDirectoryPath { get; }
+        string? BinaryDirectory { get; }
 
         /// <summary>
         ///         An identifier string consisting of the operating system platform and the
@@ -146,5 +167,19 @@
 
         /// <inheritdoc cref="ExtractArchive"/>
         Task ExtractArchiveAsync(string? destination = null);
+
+        /// <summary>
+        /// Removes the runtime directory
+        /// </summary>
+        void RemoveExtracted();
+
+        /// <summary>
+        /// <inheritdoc cref="RemoveExtracted"/>
+        /// </summary>
+        /// <param name="parallelOptions">
+        /// Stores options that configure the operation of methods on the
+        /// <see cref="System.Threading.Tasks.Parallel">Parallel</see> class.</param>
+        /// <returns></returns>
+        Task RemoveExtractedAsync(ParallelOptions? parallelOptions = null);
     }
 }
