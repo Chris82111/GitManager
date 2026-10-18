@@ -1,4 +1,6 @@
-﻿namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
+﻿using Chris82111.GitManager.GitWrapper.Core.Processes;
+
+namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 {
     public interface IGitAuthentication
     {
@@ -7,6 +9,12 @@
         int DependentCount { get; }
 
         public bool IsDisposed { get; }
+
+        // void UserActionHandler(object? sender, ProcessEventArgs e)
+        // {
+        //     var envVar = new ProcessEnvironmentVariable(e.Process.StartInfo);
+        // }
+        Action<object?, ProcessEventArgs>? UserAction { get; set; }
 
         void Dispose();
 

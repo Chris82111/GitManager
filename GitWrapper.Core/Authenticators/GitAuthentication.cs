@@ -12,6 +12,8 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
         public bool IsDisposed => _disposed;
 
+        public Action<object?, ProcessEventArgs>? UserAction { get; set; } = null;
+
         protected readonly List<IGitWrapper> _gitWrappers = new List<IGitWrapper>();
 
         /// <summary>
@@ -133,6 +135,10 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
                     gitWrapper.BeforeProcessStart -= AuthenticationToken;
                     break;
 
+                case Credentials.UserAction:
+                    gitWrapper.BeforeProcessStart -= AuthenticationUserAction;
+                    break;
+
                 default:
                     break;
             }
@@ -149,6 +155,10 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
                 case Credentials.Token:
                     gitWrapper.BeforeProcessStart += AuthenticationToken;
+                    break;
+
+                case Credentials.UserAction:
+                    gitWrapper.BeforeProcessStart += AuthenticationUserAction;
                     break;
 
                 default:
@@ -202,6 +212,11 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
                 $"{ShellQuote(_username ?? string.Empty)} {ShellQuote(_token ?? string.Empty)}; }}; f";
 
             envVar.Set("GIT_CONFIG_VALUE_1", helper);
+        }
+
+        protected virtual void AuthenticationUserAction(object? sender, ProcessEventArgs e)
+        {
+            UserAction?.Invoke(sender, e);
         }
 
         protected static string ShellQuote(string value)

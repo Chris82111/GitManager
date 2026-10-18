@@ -5,5 +5,6 @@
         Default = 0,
         Nothing,
         Token,
+        UserAction,
     }
 }

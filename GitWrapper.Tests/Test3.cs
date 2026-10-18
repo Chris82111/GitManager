@@ -1,5 +1,7 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core;
 using Chris82111.GitManager.GitWrapper.Core.Authenticators;
+using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
+using Chris82111.GitManager.GitWrapper.Core.Processes;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
@@ -137,7 +139,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         {
             var git = EnsureGitWrapper();
 
-            Assert.HasCount(3, Enum.GetNames<Credentials>());
+            Assert.HasCount(4, Enum.GetNames<Credentials>());
 
             Assert.AreEqual(Credentials.Default, git.Credential);
 
@@ -149,6 +151,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             git.Credential = Credentials.Nothing;
             Assert.AreEqual(Credentials.Nothing, git.Credential);
+
+            git.Credential = Credentials.UserAction;
+            Assert.AreEqual(Credentials.UserAction, git.Credential);
 
             git.Credential = Credentials.Default;
             Assert.AreEqual(Credentials.Default, git.Credential);
@@ -206,6 +211,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             git.Credential = Credentials.Nothing;
             Assert.AreEqual(Credentials.Nothing, git.Credential);
+
+            git.Credential = Credentials.UserAction;
+            Assert.AreEqual(Credentials.UserAction, git.Credential);
 
             git.Credential = Credentials.Default;
             Assert.AreEqual(Credentials.Default, git.Credential);
@@ -273,6 +281,11 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Authentication = authentication;
             Assert.AreEqual(Credentials.Nothing, git.Credential);
 
+            git.Credential = Credentials.UserAction;
+            git.Authentication = null;
+            git.Authentication = authentication;
+            Assert.AreEqual(Credentials.UserAction, git.Credential);
+
             git.Credential = Credentials.Default;
             git.Authentication = null;
             git.Authentication = authentication;
@@ -295,6 +308,11 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             Assert.AreEqual(Credentials.Nothing, git.Credential);
 
             git.Authentication = null;
+            git.Credential = Credentials.UserAction;
+            git.Authentication = authentication;
+            Assert.AreEqual(Credentials.UserAction, git.Credential);
+
+            git.Authentication = null;
             git.Credential = Credentials.Default;
             git.Authentication = authentication;
             Assert.AreEqual(Credentials.Default, git.Credential);
@@ -314,6 +332,11 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Authentication = authentication;
             git.Credential = Credentials.Nothing;
             Assert.AreEqual(Credentials.Nothing, git.Credential);
+
+            git.Authentication = null;
+            git.Authentication = authentication;
+            git.Credential = Credentials.UserAction;
+            Assert.AreEqual(Credentials.UserAction, git.Credential);
 
             git.Authentication = null;
             git.Authentication = authentication;
@@ -395,6 +418,25 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             Assert.AreEqual(0, dto.ExitCode);
             Assert.IsTrue(MirrorDirectory(_configData.PrivateRepo).Exists);
+        }
+
+        private bool IsUserActionCalled = false;
+        private void UserActionHandler(object? sender, ProcessEventArgs e)
+        {
+            IsUserActionCalled = true;
+        }
+
+        [TestMethod]
+        public void Test_10_UserAction()
+        {
+            var git = EnsureGitWrapper();
+
+            git.Credential = Credentials.UserAction;
+            git.Authentication.UserAction = UserActionHandler;
+
+            IsUserActionCalled = false;
+            _ = git.GitVersion();
+            Assert.IsTrue(IsUserActionCalled);
         }
     }
 }
