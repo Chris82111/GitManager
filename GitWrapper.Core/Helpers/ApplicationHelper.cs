@@ -41,7 +41,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Helpers
                     : Path.GetFileName(programName);
             }
 
-            var process = new Process
+            using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {

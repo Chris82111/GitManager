@@ -1,5 +1,6 @@
 ﻿namespace Chris82111.GitManager.GitWrapper.Core
 {
+#warning Move ProcessResultsDto into the namespace Processes
     /// <summary>
     /// Data transfer object for passing on information about the system processes used.
     /// </summary>

@@ -1,6 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using static System.Net.WebRequestMethods;
 
+using Chris82111.GitManager.GitWrapper.Core.Processes;
+
 namespace Chris82111.GitManager.GitWrapper.Core
 {
     /// <summary>
@@ -9,6 +11,21 @@ namespace Chris82111.GitManager.GitWrapper.Core
     /// </summary>
     public interface IGitWrapper
     {
+        /// <summary>
+        /// Occurs before the process starts.
+        /// </summary>
+        event EventHandler<ProcessEventArgs>? BeforeProcessStart;
+
+        /// <summary>
+        /// Occurs after the process execution completes successfully.
+        /// </summary>
+        event EventHandler<ProcessResultsEventArgs>? ProcessCompleted;
+
+        /// <summary>
+        /// Occurs after the process execution ends, regardless of whether an exception was thrown.
+        /// </summary>
+        event EventHandler? AfterProcessEnd;
+
         /// <summary>
         ///         Name of the Git application `git` (to use the system installation) or
         /// <br/>   the absolute path to the static Git version.

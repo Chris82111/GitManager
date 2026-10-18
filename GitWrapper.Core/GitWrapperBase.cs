@@ -1,4 +1,5 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core.Helpers;
+using Chris82111.GitManager.GitWrapper.Core.Processes;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
@@ -9,6 +10,15 @@ namespace Chris82111.GitManager.GitWrapper.Core
     /// </summary>
     public abstract class GitWrapperBase : IGitWrapper
     {
+        /// <inheritdoc/>
+        public event EventHandler<ProcessEventArgs>? BeforeProcessStart;
+
+        /// <inheritdoc/>
+        public event EventHandler<ProcessResultsEventArgs>? ProcessCompleted;
+
+        /// <inheritdoc/>
+        public event EventHandler? AfterProcessEnd;
+
         /// <inheritdoc/>
         public abstract string AppName { get; protected set; }
 
@@ -130,27 +140,44 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 CreateNoWindow = true
             };
 
-            psi.Environment["GIT_ASKPASS"] = "echo";
-
             ConfigureProcessStartInfo?.Invoke(psi);
 
-            var process = new Process { StartInfo = psi };
+            using var process = new Process { StartInfo = psi };
 
             if (null == process)
             {
                 return processResults;
             }
 
+            try
+            {
+                OnBeforeProcessStart(process);
             process.Start();
 
-            processResults.StandardOutput = process.StandardOutput.ReadToEnd().TrimEnd('\n').TrimEnd('\r'); ;
-            processResults.StandardError = process.StandardError.ReadToEnd().TrimEnd('\n').TrimEnd('\r'); ;
+                var standardOutputTask = Task.Run(() => process.StandardOutput.ReadToEnd());
+                var standardErrorTask = Task.Run(() => process.StandardError.ReadToEnd());
+
+                Task.WaitAll(standardOutputTask, standardErrorTask);
+
+                processResults.StandardOutput = standardOutputTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
+
+                processResults.StandardError = standardErrorTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
 
             process.WaitForExit();
 
             processResults.ExitCode = process.ExitCode;
+                OnProcessCompleted(processResults);
 
             return processResults;
+        }
+            finally
+            {
+                OnAfterProcessEnd();
+            }
         }
 
         /// <inheritdoc/>
@@ -183,27 +210,42 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 CreateNoWindow = true
             };
 
-            psi.Environment["GIT_ASKPASS"] = "echo";
-
             ConfigureProcessStartInfo?.Invoke(psi);
 
-            var process = new Process { StartInfo = psi };
+            using var process = new Process { StartInfo = psi };
 
             if (null == process)
             {
                 return processResults;
             }
 
+            try
+            {
+                OnBeforeProcessStart(process);
             process.Start();
             
-            processResults.StandardOutput = (await process.StandardOutput.ReadToEndAsync()).TrimEnd('\n').TrimEnd('\r');
-            processResults.StandardError = (await process.StandardError.ReadToEndAsync()).TrimEnd('\n').TrimEnd('\r');
+                var standardOutputTask = process.StandardOutput.ReadToEndAsync();
+                var standardErrorTask = process.StandardError.ReadToEndAsync();
 
-            await process.WaitForExitAsync();
+                await Task.WhenAll(standardOutputTask, standardErrorTask);
+
+                processResults.StandardOutput = standardOutputTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
+
+                processResults.StandardError = standardErrorTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
 
             processResults.ExitCode = process.ExitCode;
+                OnProcessCompleted(processResults);
 
             return processResults;
+        }
+            finally
+            {
+                OnAfterProcessEnd();
+            }
         }
 
         /// <inheritdoc/>
@@ -229,27 +271,44 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 CreateNoWindow = true
             };
 
-            psi.Environment["GIT_ASKPASS"] = "echo";
-
             ConfigureProcessStartInfo?.Invoke(psi);
 
-            var process = new Process { StartInfo = psi };
+            using var process = new Process { StartInfo = psi };
 
             if (null == process)
             {
                 return processResults;
             }
 
+            try
+            {
+                OnBeforeProcessStart(process);
             process.Start();
 
-            processResults.StandardOutput = process.StandardOutput.ReadToEnd().TrimEnd('\n').TrimEnd('\r');
-            processResults.StandardError = process.StandardError.ReadToEnd().TrimEnd('\n').TrimEnd('\r');
+                var standardOutputTask = Task.Run(() => process.StandardOutput.ReadToEnd());
+                var standardErrorTask = Task.Run(() => process.StandardError.ReadToEnd());
+
+                Task.WaitAll(standardOutputTask, standardErrorTask);
+
+                processResults.StandardOutput = standardOutputTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
+
+                processResults.StandardError = standardErrorTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
 
             process.WaitForExit();
 
             processResults.ExitCode = process.ExitCode;
+                OnProcessCompleted(processResults);
 
             return processResults;
+        }
+            finally
+            {
+                OnAfterProcessEnd();
+            }
         }
 
         /// <inheritdoc/>
@@ -275,27 +334,42 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 CreateNoWindow = true
             };
 
-            psi.Environment["GIT_ASKPASS"] = "echo";
-
             ConfigureProcessStartInfo?.Invoke(psi);
 
-            var process = new Process { StartInfo = psi };
+            using var process = new Process { StartInfo = psi };
 
             if (null == process)
             {
                 return processResults;
             }
 
+            try
+            {
+                OnBeforeProcessStart(process);
             process.Start();
             
-            processResults.StandardOutput = (await process.StandardOutput.ReadToEndAsync()).TrimEnd('\n').TrimEnd('\r');
-            processResults.StandardError = (await process.StandardError.ReadToEndAsync()).TrimEnd('\n').TrimEnd('\r');
+                var standardOutputTask = process.StandardOutput.ReadToEndAsync();
+                var standardErrorTask = process.StandardError.ReadToEndAsync();
 
-            await process.WaitForExitAsync();
+                await Task.WhenAll(standardOutputTask, standardErrorTask);
+
+                processResults.StandardOutput = standardOutputTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
+
+                processResults.StandardError = standardErrorTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
 
             processResults.ExitCode = process.ExitCode;
+                OnProcessCompleted(processResults);
 
             return processResults;
+        }
+            finally
+            {
+                OnAfterProcessEnd();
+            }
         }
 
         /// <inheritdoc/>
@@ -511,6 +585,21 @@ namespace Chris82111.GitManager.GitWrapper.Core
             }
 
             return extract;
+        }
+        
+        private void OnBeforeProcessStart(Process process)
+        {
+            BeforeProcessStart?.Invoke(this, new ProcessEventArgs(process));
+        }
+
+        private void OnProcessCompleted(ProcessResultsDto processResults)
+        {
+            ProcessCompleted?.Invoke(this, new ProcessResultsEventArgs(processResults));
+        }
+
+        private void OnAfterProcessEnd()
+        {
+            AfterProcessEnd?.Invoke(this, EventArgs.Empty);
         }
     }
 }
