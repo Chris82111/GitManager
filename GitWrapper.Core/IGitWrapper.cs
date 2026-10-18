@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using static System.Net.WebRequestMethods;
+﻿using Chris82111.GitManager.GitWrapper.Core.Authenticators;
 
 using Chris82111.GitManager.GitWrapper.Core.Processes;
 
@@ -205,5 +204,12 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <see cref="System.Threading.Tasks.Parallel">Parallel</see> class.</param>
         /// <returns></returns>
         Task RemoveExtractedAsync(ParallelOptions? parallelOptions = null);
+
+
+        IGitAuthentication Authentication { get; set; }
+
+        event EventHandler<CredentialChangedEventArgs>? CredentialChanged;
+
+        public Credentials Credential { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Chris82111.GitManager.GitWrapper.Core.Helpers;
+﻿using Chris82111.GitManager.GitWrapper.Core.Authenticators;
+using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using Chris82111.GitManager.GitWrapper.Core.Processes;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -152,7 +153,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
             try
             {
                 OnBeforeProcessStart(process);
-            process.Start();
+                process.Start();
 
                 var standardOutputTask = Task.Run(() => process.StandardOutput.ReadToEnd());
                 var standardErrorTask = Task.Run(() => process.StandardError.ReadToEnd());
@@ -167,13 +168,13 @@ namespace Chris82111.GitManager.GitWrapper.Core
                     .TrimEnd('\n')
                     .TrimEnd('\r');
 
-            process.WaitForExit();
+                process.WaitForExit();
 
-            processResults.ExitCode = process.ExitCode;
+                processResults.ExitCode = process.ExitCode;
                 OnProcessCompleted(processResults);
 
-            return processResults;
-        }
+                return processResults;
+            }
             finally
             {
                 OnAfterProcessEnd();
@@ -222,8 +223,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
             try
             {
                 OnBeforeProcessStart(process);
-            process.Start();
-            
+                process.Start();
+
                 var standardOutputTask = process.StandardOutput.ReadToEndAsync();
                 var standardErrorTask = process.StandardError.ReadToEndAsync();
 
@@ -237,11 +238,11 @@ namespace Chris82111.GitManager.GitWrapper.Core
                     .TrimEnd('\n')
                     .TrimEnd('\r');
 
-            processResults.ExitCode = process.ExitCode;
+                processResults.ExitCode = process.ExitCode;
                 OnProcessCompleted(processResults);
 
-            return processResults;
-        }
+                return processResults;
+            }
             finally
             {
                 OnAfterProcessEnd();
@@ -283,7 +284,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
             try
             {
                 OnBeforeProcessStart(process);
-            process.Start();
+                process.Start();
 
                 var standardOutputTask = Task.Run(() => process.StandardOutput.ReadToEnd());
                 var standardErrorTask = Task.Run(() => process.StandardError.ReadToEnd());
@@ -298,13 +299,13 @@ namespace Chris82111.GitManager.GitWrapper.Core
                     .TrimEnd('\n')
                     .TrimEnd('\r');
 
-            process.WaitForExit();
+                process.WaitForExit();
 
-            processResults.ExitCode = process.ExitCode;
+                processResults.ExitCode = process.ExitCode;
                 OnProcessCompleted(processResults);
 
-            return processResults;
-        }
+                return processResults;
+            }
             finally
             {
                 OnAfterProcessEnd();
@@ -346,8 +347,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
             try
             {
                 OnBeforeProcessStart(process);
-            process.Start();
-            
+                process.Start();
+
                 var standardOutputTask = process.StandardOutput.ReadToEndAsync();
                 var standardErrorTask = process.StandardError.ReadToEndAsync();
 
@@ -361,11 +362,11 @@ namespace Chris82111.GitManager.GitWrapper.Core
                     .TrimEnd('\n')
                     .TrimEnd('\r');
 
-            processResults.ExitCode = process.ExitCode;
+                processResults.ExitCode = process.ExitCode;
                 OnProcessCompleted(processResults);
 
-            return processResults;
-        }
+                return processResults;
+            }
             finally
             {
                 OnAfterProcessEnd();
@@ -448,6 +449,54 @@ namespace Chris82111.GitManager.GitWrapper.Core
 
             System.IO.Directory.Delete(runtimeDirectory, recursive: true);
         }
+
+
+        #region
+
+        public event EventHandler<CredentialChangedEventArgs>? CredentialChanged;
+
+        private IGitAuthentication _authentication;
+
+        public IGitAuthentication Authentication
+        { 
+            get => _authentication;
+            set
+            {
+                _authentication?.Disconnect(this);
+                _authentication = value;
+                _authentication?.Connect(this);
+            }
+        }
+
+        public Credentials _credential = Credentials.Default;
+
+        public Credentials Credential
+        {
+            get => _credential;
+            set
+            {
+                if(_credential != value)
+                {
+                    var oldCredential = _credential;
+                    _credential = value;
+                    OnCredentialChanged(oldCredential, value);
+                }
+            } 
+        }
+
+        public GitWrapperBase()
+        {
+            _authentication = new GitAuthenticationBase();
+            _authentication.Connect(this);
+        }
+
+        private void OnCredentialChanged(Credentials previousCredential, Credentials credential)
+        {
+            CredentialChanged?.Invoke(this, new CredentialChangedEventArgs(previousCredential, credential));
+        }
+
+        #endregion
+
 
         /// <summary>
         ///         Determines the required paths to the directories and the application to be launched.
