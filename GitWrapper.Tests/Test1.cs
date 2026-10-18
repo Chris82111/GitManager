@@ -67,9 +67,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_02_UsableWindowsX64()
         {
-            if (false == RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (GitWrapperWindowsX64.ClassIdentifier != GitWrapper.Core.Helpers.RuntimeHelper.Identifier)
             {
-                return;
+                Assert.Inconclusive($"This test requires {GitWrapperWindowsX64.ClassIdentifier} as the operating system");
             }
 
             var gitWrapperWindowsX64 = new GitWrapperWindowsX64();
@@ -97,9 +97,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public async Task Test_02_UsableWindowsX64Async()
         {
-            if (false == RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (GitWrapperWindowsX64.ClassIdentifier != GitWrapper.Core.Helpers.RuntimeHelper.Identifier)
             {
-                return;
+                Assert.Inconclusive($"This test requires {GitWrapperWindowsX64.ClassIdentifier} as the operating system");
             }
 
             var gitWrapperWindowsX64 = new GitWrapperWindowsX64();
@@ -127,9 +127,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_02_UsableLinuxX64()
         {
-            if (false == RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (GitWrapperLinuxX64.ClassIdentifier != GitWrapper.Core.Helpers.RuntimeHelper.Identifier)
             {
-                return;
+                Assert.Inconclusive($"This test requires {GitWrapperLinuxX64.ClassIdentifier} as the operating system");
             }
 
             var gitWrapperLinuxX64 = new GitWrapperLinuxX64();
@@ -157,9 +157,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public async Task Test_02_UsableLinuxX64Async()
         {
-            if (false == RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (GitWrapperLinuxX64.ClassIdentifier != GitWrapper.Core.Helpers.RuntimeHelper.Identifier)
             {
-                return;
+                Assert.Inconclusive($"This test requires {GitWrapperLinuxX64.ClassIdentifier} as the operating system");
             }
 
             var gitWrapperLinuxX64 = new GitWrapperLinuxX64();
@@ -187,9 +187,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_03_FactoryLocalAndWindowsX64()
         {
-            if (false == RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (GitWrapperWindowsX64.ClassIdentifier != GitWrapper.Core.Helpers.RuntimeHelper.Identifier)
             {
-                return;
+                Assert.Inconclusive($"This test requires {GitWrapperWindowsX64.ClassIdentifier} as the operating system");
             }
 
             IGitWrapper git; 
@@ -214,9 +214,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_03_FactoryLocalAndLinuxX64()
         {
-            if (false == RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (GitWrapperLinuxX64.ClassIdentifier != GitWrapper.Core.Helpers.RuntimeHelper.Identifier)
             {
-                return;
+                Assert.Inconclusive($"This test requires {GitWrapperLinuxX64.ClassIdentifier} as the operating system");
             }
 
             IGitWrapper git;
@@ -291,9 +291,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_05_GitCloneWindowsX64()
         {
-            if (false == RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (GitWrapperWindowsX64.ClassIdentifier != GitWrapper.Core.Helpers.RuntimeHelper.Identifier)
             {
-                return;
+                Assert.Inconclusive($"This test requires {GitWrapperWindowsX64.ClassIdentifier} as the operating system");
             }
 
             var git = new GitWrapperWindowsX64();
@@ -325,9 +325,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public async Task Test_05_GitCloneWindowsX64Async()
         {
-            if (false == RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (GitWrapperWindowsX64.ClassIdentifier != GitWrapper.Core.Helpers.RuntimeHelper.Identifier)
             {
-                return;
+                Assert.Inconclusive($"This test requires {GitWrapperWindowsX64.ClassIdentifier} as the operating system");
             }
 
             var git = new GitWrapperWindowsX64();
@@ -451,7 +451,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             // so that an exception is always triggered when a different system is used.
             if (GitWrapperWindowsX64.ClassIdentifier != GitWrapper.Core.Helpers.RuntimeHelper.Identifier)
             {
-                return;
+                Assert.Inconclusive($"This test requires {GitWrapperWindowsX64.ClassIdentifier} as the operating system");
             }
 
             var git = new GitWrapperWindowsX64();

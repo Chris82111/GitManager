@@ -1,7 +1,6 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core;
 using Chris82111.GitManager.GitWrapper.Core.Archives;
 using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
-using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using Chris82111.GitManager.GitWrapper.Static.WindowsX64.Lib;
 using System.Runtime.InteropServices;
 
