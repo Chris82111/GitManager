@@ -1,19 +1,28 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
 using Chris82111.GitManager.GitWrapper.Core.Processes;
-using System.Runtime.InteropServices;
 
 namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 {
+    /// <summary>
+    /// Basic implementation for authenticating the <see cref="IGitWrapper"/> class using various authentication methods
+    /// </summary>
     public class GitAuthenticationBase : IGitAuthentication, IDisposable
     {
+        /// <inheritdoc />
         public string Name { get; set; } = string.Empty;
 
+        /// <inheritdoc />
         public int DependentCount => _gitWrappers.Count;
 
+        /// <inheritdoc />
         public bool IsDisposed => _disposed;
 
+        /// <inheritdoc />
         public Action<object?, ProcessEventArgs>? UserAction { get; set; } = null;
 
+        /// <summary>
+        /// Contains references to the objects that use this authenticator
+        /// </summary>
         protected readonly List<IGitWrapper> _gitWrappers = new List<IGitWrapper>();
 
 #warning _nullDevice should always be /dev/null because Git for Windows uses MinGW
@@ -29,12 +38,19 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
         #region Dispose
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        ///         Underlying disposal function.
+        /// <br/>
+        /// <br/>   <inheritdoc cref="Dispose()"/>
+        /// </summary>
+        /// <param name="disposing">Indicates whether the call originates from Dispose (true) or a finalizer (false).</param>
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)
@@ -44,6 +60,9 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
             if (disposing)
             {
+                ClearToken();
+                ClearSsh();
+
                 var gitWrappers = _gitWrappers.ToList();
                 foreach (var gitWrapper in gitWrappers)
                 {
@@ -58,7 +77,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
         #endregion
 
-
+        /// <inheritdoc />
         public void Connect(IGitWrapper gitWrapper)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
@@ -71,6 +90,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
             }
         }
 
+        /// <inheritdoc />
         public void Disconnect(IGitWrapper gitWrapper)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
@@ -83,11 +103,18 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
         #region Token
 
+        /// <summary>
+        /// The username can be null; in that case, "oauth2" is used, which works on GitHub
+        /// </summary>
         protected string? _username = null;
 
 #warning Not currently encrypted
+        /// <summary>
+        /// The token (known as the "personal access token" on GitHub)
+        /// </summary>
         protected string? _token = null;
 
+        /// <inheritdoc />
         public bool IsTokenValid()
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
@@ -97,14 +124,18 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
                 false == string.IsNullOrWhiteSpace(_token);
         }
 
+        /// <inheritdoc />
         public void SetToken(string? username, string token)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
+
+            ArgumentNullException.ThrowIfNull(token);
 
             _username = username ?? "oauth2";
             _token = token;
         }
 
+        /// <inheritdoc />
         public void ClearToken()
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
@@ -118,11 +149,18 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
         #region Ssh
 
+        /// <summary>
+        /// The path to the SSH file
+        /// </summary>
         protected string? _filePath = null;
 
 #warning Not currently encrypted
+        /// <summary>
+        /// The passphrase for the SSH file. If the file is not password-protected, <c>null</c> may be used
+        /// </summary>
         protected string? _password = null;
 
+        /// <inheritdoc />
         public bool IsSshValid()
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
@@ -134,14 +172,18 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
                 false == string.IsNullOrEmpty(_password);
         }
 
-        public void SetSsh(string filePath, string password)
+        /// <inheritdoc />
+        public void SetSsh(string filePath, string? password = null)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
+
+            ArgumentNullException.ThrowIfNull(filePath);
 
             _filePath = filePath;
             _password = password;
         }
 
+        /// <inheritdoc />
         public void ClearSsh()
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
@@ -152,7 +194,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
         #endregion
 
-
+        /// <inheritdoc />
         public void CredentialChangedHandler(object? sender, CredentialChangedEventArgs e)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
@@ -215,6 +257,17 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
         #region Logic
 
+#warning Check all handler here and change the sender parameter if possible as well as add a sender and e description
+        /// <summary>
+        ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
+        /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
+        /// <br/>   behaviour accordingly.
+        /// <br/>   
+        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.Nothing"/>:
+        /// <br/>   <inheritdoc cref="Credentials.Nothing"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected virtual void AuthenticationNothing(object? sender, ProcessEventArgs e)
         {
             var envVar = new ProcessEnvironmentVariable(e.Process.StartInfo);
@@ -236,6 +289,16 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
             envVar.Set("SSH_AUTH_SOCK", string.Empty); // Disable SSH agent (ignore any running agent)
         }
 
+        /// <summary>
+        ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
+        /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
+        /// <br/>   behaviour accordingly.
+        /// <br/>   
+        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.Token"/>:
+        /// <br/>   <inheritdoc cref="Credentials.Token"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected virtual void AuthenticationToken(object? sender, ProcessEventArgs e)
         {
             var envVar = new ProcessEnvironmentVariable(e.Process.StartInfo);
@@ -270,19 +333,32 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
             envVar.Set("GIT_CONFIG_VALUE_1", helper);
         }
 
+        /// <summary>
+        ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
+        /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
+        /// <br/>   behaviour accordingly.
+        /// <br/>   
+        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.UserAction"/>:
+        /// <br/>   <inheritdoc cref="Credentials.UserAction"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected virtual void AuthenticationUserAction(object? sender, ProcessEventArgs e)
         {
             UserAction?.Invoke(sender, e);
         }
 
-        // GitHub needs the public key, created with:
-        // ssh-keygen -t ed25519 -C "Optional comment like a name or your email@example.com"
-        
-
-        // Use the right URL, if using ssh
-        // git@github.com:Chris82111/Repo.git
-        // ssh://git@github.com/Chris82111/Repo.git
-        protected virtual void AuthenticationSshUnencrypted(object? sender, ProcessEventArgs e)
+        /// <summary>
+        ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
+        /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
+        /// <br/>   behaviour accordingly.
+        /// <br/>   
+        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.SshNoPassphrase"/>:
+        /// <br/>   <inheritdoc cref="Credentials.SshNoPassphrase"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected virtual void AuthenticationSshNoPassphrase(object? sender, ProcessEventArgs e)
         {
             var envVar = new ProcessEnvironmentVariable(e.Process.StartInfo);
 
@@ -324,9 +400,19 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
             envVar.Set("GIT_CONFIG_SYSTEM", _nullDevice); // Ignore system-wide config file (point to null device)
         }
 
+        /// <summary>
+        ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
+        /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
+        /// <br/>   behaviour accordingly.
+        /// <br/>   
+        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.Ssh"/>:
+        /// <br/>   <inheritdoc cref="Credentials.Ssh"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected virtual void AuthenticationSsh(object? sender, ProcessEventArgs e)
         {
-            IGitWrapper gitWrapper = (IGitWrapper)sender!;
+            var gitWrapper = (IGitWrapper)sender!;
 
             if (null == gitWrapper.SshPassphrase)
             {
@@ -342,12 +428,18 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
                 throw new Exception($"File does not exists, '{gitWrapper.SshPassphrase}'");
             }
 
-            var envVar = new ProcessEnvironmentVariable(e.Process.StartInfo);
+#warning Check the logic
+            //if (null == _password)
+            //{
+            //    throw new NullReferenceException($"A passphrase is required; set the '{nameof(_password)}' variable");
+            //}
 
             if (false == IsSshValid())
             {
                 throw new NullReferenceException($"Error with internal stored ssh file call the methode '{nameof(SetSsh)}' first.");
             }
+
+            var envVar = new ProcessEnvironmentVariable(e.Process.StartInfo);
 
             // --- Configure GIT_SSH_COMMAND for non-interactive Git operations ---
             envVar.Set("GIT_SSH_COMMAND",
@@ -372,15 +464,13 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
             
             envVar.Set("SSH_AUTH_SOCK", string.Empty); // Disable SSH agent (ignore any running agent)
 
-
             envVar.Set("SSH_ASKPASS", gitWrapper.SshPassphrase);
             envVar.Set("SSH_ASKPASS_REQUIRE", "force");
 
-            if (null == _password)
+            if (null != _password)
             {
-                throw new NullReferenceException($"A passphrase is required; set the '{nameof(_password)}' variable");
+                envVar.Set("GIT_MANAGER_SSH_PASSPHRASE", _password);
             }
-            envVar.Set("GIT_MANAGER_SSH_PASSPHRASE", _password);
 
             // --- Config file overrides ---
             envVar.Set("GIT_CONFIG_NOSYSTEM", "1");      // Ignore system-wide Git configuration
@@ -388,11 +478,15 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
             envVar.Set("GIT_CONFIG_SYSTEM", _nullDevice); // Ignore system-wide config file (point to null device)
         }
 
+        /// <summary>
+        /// Quotes a value for use as a shell argument
+        /// </summary>
+        /// <param name="value">The value to quote</param>
         protected static string ShellQuote(string value)
         {
             return "'" + value.Replace("'", "'\\''") + "'";
         }
 
-#endregion
+        #endregion
     }
 }

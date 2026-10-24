@@ -453,12 +453,18 @@ namespace Chris82111.GitManager.GitWrapper.Core
 
         #region Authentication
 
-        public abstract string? SshPassphrase { get; protected set; }
-
+        /// <inheritdoc />
         public event EventHandler<CredentialChangedEventArgs>? CredentialChanged;
 
-        private IGitAuthentication _authentication;
+        /// <inheritdoc />
+        public abstract string? SshPassphrase { get; protected set; }
 
+        /// <summary>
+        /// Holds the object reference; see <see cref="GitWrapperBase.Authentication"/>
+        /// </summary>
+        protected IGitAuthentication _authentication;
+
+        /// <inheritdoc />
         public IGitAuthentication Authentication
         { 
             get => _authentication;
@@ -470,8 +476,12 @@ namespace Chris82111.GitManager.GitWrapper.Core
             }
         }
 
-        public Credentials _credential = Credentials.Default;
+        /// <summary>
+        /// Holds the object reference; see <see cref="GitWrapperBase.Credential"/>
+        /// </summary>
+        protected Credentials _credential = Credentials.Default;
 
+        /// <inheritdoc />
         public Credentials Credential
         {
             get => _credential;
@@ -486,10 +496,12 @@ namespace Chris82111.GitManager.GitWrapper.Core
             } 
         }
 
+        /// <summary>
+        /// Base class constructor that creates a default instance of <see cref="GitAuthenticationBase"/>.
+        /// </summary>
         public GitWrapperBase()
         {
             _authentication = new GitAuthenticationBase();
-            _authentication.Connect(this);
         }
 
         private void OnCredentialChanged(Credentials previousCredential, Credentials credential)

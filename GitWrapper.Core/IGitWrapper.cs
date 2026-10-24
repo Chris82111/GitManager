@@ -207,14 +207,26 @@ namespace Chris82111.GitManager.GitWrapper.Core
 
         #region Authentication
 
-#warning There is another option in Windows: running a batch file that launches a Bash shell. Or, in Linux: launching a Bash shell directly
-        // var path = @"GitManager\ReadSshPassphrase.cmd";
+#warning There is another option in Windows: running a batch file that launches a Bash shell. Or, in Linux: launching a Bash shell directly, @"GitManager\ReadSshPassphrase.cmd";
+        /// <summary>
+        /// Contains a path to the utility that replaces the SSH agent, or null.
+        /// </summary>
         string? SshPassphrase { get; }
 
+        /// <summary>
+        ///         Authentication class used via DI. It is automatically created with a new instance.
+        /// <br/>   However, it is possible to create a separate instance and use it in several GitWrapper classes simultaneously.
+        /// </summary>
         IGitAuthentication Authentication { get; set; }
 
+        /// <summary>
+        /// Event that is triggered when a new authentication method is to be used 
+        /// </summary>
         event EventHandler<CredentialChangedEventArgs>? CredentialChanged;
 
+        /// <summary>
+        /// Selecting the authentication method to be used
+        /// </summary>
         public Credentials Credential { get; set; }
 
         #endregion

@@ -471,7 +471,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         public void Test_11_SshWrongUrl()
         {
             var git = EnsureGitWrapper();
-            RemoveMirror(_configData.PrivateRepoSsh);
+            RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
 
             git.Credential = Credentials.Ssh;
@@ -491,7 +491,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         public void Test_12_SshRightUrl()
         {
             var git = EnsureGitWrapper();
-            RemoveMirror(_configData.PrivateRepoSsh);
+            RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
 
             git.Credential = Credentials.Ssh;
