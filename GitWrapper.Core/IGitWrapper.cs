@@ -205,11 +205,18 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <returns></returns>
         Task RemoveExtractedAsync(ParallelOptions? parallelOptions = null);
 
+        #region Authentication
+
+#warning There is another option in Windows: running a batch file that launches a Bash shell. Or, in Linux: launching a Bash shell directly
+        // var path = @"GitManager\ReadSshPassphrase.cmd";
+        string? SshPassphrase { get; }
 
         IGitAuthentication Authentication { get; set; }
 
         event EventHandler<CredentialChangedEventArgs>? CredentialChanged;
 
         public Credentials Credential { get; set; }
+
+        #endregion
     }
 }

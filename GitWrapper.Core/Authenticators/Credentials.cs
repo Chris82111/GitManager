@@ -6,5 +6,6 @@
         Nothing,
         Token,
         UserAction,
+        Ssh,
     }
 }

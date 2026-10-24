@@ -36,14 +36,5 @@ Supports: Linux X64</Description>
     <None Include="LICENSE" Pack="true" PackagePath="/" />
     <None Include="THIRD_PARTY_LICENSES" Pack="true" PackagePath="/" />
   </ItemGroup>
-
-  <Import Project="Lib/LibraryConfigDefaults.props" />
-  <Import Project="Lib/LibraryConfigOverrides.props" Condition="Exists('Lib/LibraryConfigOverrides.props')" />
-
-  <!-- PROPS first -->
-  <Import Project="Lib/GitLinux.props" />
-
-  <!-- TARGETS last -->
-  <Import Project="Lib/GitLinux.targets" />
     
 </Project>

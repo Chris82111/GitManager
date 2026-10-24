@@ -8,6 +8,9 @@
         /// <inheritdoc/>
         public override string AppName { get; protected set; } = "git";
 
+        /// <inheritdoc/>
+        public override string? SshPassphrase { get; protected set; } = null;
+
         /// <inheritdoc cref="GitWrapperBase.Identifier"/>
         public static string ClassIdentifier { get; } = "default";
 

@@ -1,6 +1,5 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core;
 using Chris82111.GitManager.GitWrapper.Core.Authenticators;
-using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
 using Chris82111.GitManager.GitWrapper.Core.Processes;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -14,10 +13,13 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         private sealed class ConfigData
         {
             public required string Username { get; init; }
-
             public required string Token { get; init; }
-
             public required string PrivateRepo { get; init; }
+            public required string PrivateRepoSsh { get; init; }
+            public required string SshFile { get; init; }
+            public required string SshFileInvalid { get; init; }
+            public required string SshFilePwProtected { get; init; }
+            public required string SshFilePassword { get; init; }
         }
 
         private const string _configFile = ".GitManager.json";
@@ -47,6 +49,11 @@ namespace Chris82111.GitManager.GitWrapper.Tests
                     Username = "",
                     Token = "",
                     PrivateRepo = "",
+                    PrivateRepoSsh = "",
+                    SshFile = "",
+                    SshFileInvalid = "",
+                    SshFilePwProtected = "",
+                    SshFilePassword = "",
                 };
 #endif
 
@@ -139,7 +146,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         {
             var git = EnsureGitWrapper();
 
-            Assert.HasCount(4, Enum.GetNames<Credentials>());
+            Assert.HasCount(5, Enum.GetNames<Credentials>());
 
             Assert.AreEqual(Credentials.Default, git.Credential);
 
@@ -154,6 +161,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             git.Credential = Credentials.UserAction;
             Assert.AreEqual(Credentials.UserAction, git.Credential);
+
+            git.Credential = Credentials.Ssh;
+            Assert.AreEqual(Credentials.Ssh, git.Credential);
 
             git.Credential = Credentials.Default;
             Assert.AreEqual(Credentials.Default, git.Credential);
@@ -214,6 +224,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             git.Credential = Credentials.UserAction;
             Assert.AreEqual(Credentials.UserAction, git.Credential);
+
+            git.Credential = Credentials.Ssh;
+            Assert.AreEqual(Credentials.Ssh, git.Credential);
 
             git.Credential = Credentials.Default;
             Assert.AreEqual(Credentials.Default, git.Credential);
@@ -286,6 +299,11 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Authentication = authentication;
             Assert.AreEqual(Credentials.UserAction, git.Credential);
 
+            git.Credential = Credentials.Ssh;
+            git.Authentication = null;
+            git.Authentication = authentication;
+            Assert.AreEqual(Credentials.Ssh, git.Credential);
+
             git.Credential = Credentials.Default;
             git.Authentication = null;
             git.Authentication = authentication;
@@ -313,6 +331,11 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             Assert.AreEqual(Credentials.UserAction, git.Credential);
 
             git.Authentication = null;
+            git.Credential = Credentials.Ssh;
+            git.Authentication = authentication;
+            Assert.AreEqual(Credentials.Ssh, git.Credential);
+
+            git.Authentication = null;
             git.Credential = Credentials.Default;
             git.Authentication = authentication;
             Assert.AreEqual(Credentials.Default, git.Credential);
@@ -337,6 +360,11 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Authentication = authentication;
             git.Credential = Credentials.UserAction;
             Assert.AreEqual(Credentials.UserAction, git.Credential);
+
+            git.Authentication = null;
+            git.Authentication = authentication;
+            git.Credential = Credentials.Ssh;
+            Assert.AreEqual(Credentials.Ssh, git.Credential);
 
             git.Authentication = null;
             git.Authentication = authentication;
@@ -437,6 +465,72 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             IsUserActionCalled = false;
             _ = git.GitVersion();
             Assert.IsTrue(IsUserActionCalled);
+        }
+
+        [TestMethod]
+        public void Test_11_SshWrongUrl()
+        {
+            var git = EnsureGitWrapper();
+            RemoveMirror(_configData.PrivateRepoSsh);
+            Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
+
+            git.Credential = Credentials.Ssh;
+
+            git.Authentication.SetSsh(_configData.SshFileInvalid, string.Empty);
+            var dto = git.Mirror(_configData.PrivateRepo);
+            Assert.AreEqual(128, dto.ExitCode);
+            Assert.IsFalse(MirrorDirectory(_configData.PrivateRepo).Exists);
+
+            git.Authentication.SetSsh(_configData.SshFile, string.Empty);
+            dto = git.Mirror(_configData.PrivateRepo);
+            Assert.AreEqual(128, dto.ExitCode);
+            Assert.IsFalse(MirrorDirectory(_configData.PrivateRepo).Exists);
+        }
+
+        [TestMethod]
+        public void Test_12_SshRightUrl()
+        {
+            var git = EnsureGitWrapper();
+            RemoveMirror(_configData.PrivateRepoSsh);
+            Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
+
+            git.Credential = Credentials.Ssh;
+
+            git.Authentication.SetSsh(_configData.SshFileInvalid, string.Empty);
+            var dto = git.Mirror(_configData.PrivateRepoSsh);
+            Assert.AreEqual(128, dto.ExitCode);
+            Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
+
+            git.Authentication.SetSsh(_configData.SshFile, string.Empty);
+            dto = git.Mirror(_configData.PrivateRepoSsh);
+            Assert.AreEqual(0, dto.ExitCode);
+            Assert.IsTrue(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
+        }
+
+        [TestMethod]
+        public void Test_13_SshPassword()
+        {
+            var git = EnsureGitWrapper();
+            RemoveMirror(_configData!.PrivateRepoSsh);
+            Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
+
+            git.Credential = Credentials.Ssh;
+
+            git.Authentication.SetSsh(_configData.SshFilePwProtected, _configData.SshFilePassword);
+            var dto = git.Mirror(_configData.PrivateRepoSsh);
+
+
+            string filePath = @"log.txt";
+            string logLine = dto.StandardError;
+            File.WriteAllText(filePath, logLine);
+
+            git = new GitWrapperSystem();
+            git.Credential = Credentials.Ssh;
+            git.Authentication.SetSsh(_configData.SshFilePwProtected, _configData.SshFilePassword);
+            dto = git.Mirror(_configData.PrivateRepoSsh);
+
+            Assert.AreEqual(0, dto.ExitCode);
+            Assert.IsTrue(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
         }
     }
 }

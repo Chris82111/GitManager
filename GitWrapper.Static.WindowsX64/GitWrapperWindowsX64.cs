@@ -2,6 +2,7 @@
 using Chris82111.GitManager.GitWrapper.Core.Archives;
 using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
 using Chris82111.GitManager.GitWrapper.Static.WindowsX64.Lib;
+using Chris82111.GitManager.GitWrapper.Static.WindowsX64.LibSshHelper;
 using System.Runtime.InteropServices;
 
 namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
@@ -13,6 +14,9 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
    {
         /// <inheritdoc/>
         public override string AppName { get; protected set; } = "";
+
+        /// <inheritdoc/>
+        public override string SshPassphrase { get; protected set; } = LibSshHelperPaths.FileRelative;
 
         /// <inheritdoc cref="GitWrapperBase.Identifier"/>
         public static string ClassIdentifier { get; } = $"{OSPlatform.Windows}-{Architecture.X64}";

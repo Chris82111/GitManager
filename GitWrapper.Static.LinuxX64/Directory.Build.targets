@@ -1,0 +1,7 @@
+<Project>
+
+  <!-- TARGETS -->
+  <Import Project="Lib/GitLinux.targets" />
+  <Import Project="LibSshHelper/Build.targets" />
+    
+</Project>

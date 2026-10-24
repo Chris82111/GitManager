@@ -451,7 +451,9 @@ namespace Chris82111.GitManager.GitWrapper.Core
         }
 
 
-        #region
+        #region Authentication
+
+        public abstract string? SshPassphrase { get; protected set; }
 
         public event EventHandler<CredentialChangedEventArgs>? CredentialChanged;
 

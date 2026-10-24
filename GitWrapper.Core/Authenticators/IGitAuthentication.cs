@@ -29,6 +29,12 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
         void ClearToken();
 
+        bool IsSshValid();
+
+        void SetSsh(string filePath, string password);
+
+        void ClearSsh();
+
         void CredentialChangedHandler(object? sender, CredentialChangedEventArgs e);
     }
 }
