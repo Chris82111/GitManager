@@ -61,6 +61,12 @@ More examples are listed here [EXAMPLES.md](./Docs/EXAMPLES.md).
 
 The [BUILD.md](./Docs/BUILD.md) section is only relevant to developers or people who will be build this repository.
 
+## Security Considerations
+
+GitManager pass sensitive credentials, such as tokens and SSH passphrases, to Git through environment variables of the started process. 
+This avoids exposing the credentials as command-line arguments, but environment variables are not a secure secret store. Depending on the operating system and the privileges available to other processes, the environment of a running process may potentially be inspected by other software, debugging tools, or malicious processes.
+Use GitManager only in a trusted environment and protect the machine and user account from unauthorized access. If a token or SSH passphrase is compromised, revoke or replace the affected credential immediately.
+
 ## License
 
 This repository has the [MIT](https://spdx.org/licenses/MIT.html) license ([LICENSE](LICENSE) file), but it uses many other projects, each of which has its own license that must be observed, see [THIRD_PARTY_LICENSES](THIRD_PARTY_LICENSES). The [LICENSES.md](./Docs/LICENSES.md) section provides a better overview of the various licenses.  
