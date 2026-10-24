@@ -130,6 +130,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 directory = Directory;
             }
 
+            System.IO.Directory.CreateDirectory(directory);
+
             var psi = new ProcessStartInfo
             {
                 FileName = AppName,
@@ -200,6 +202,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 directory = Directory;
             }
 
+            System.IO.Directory.CreateDirectory(directory);
+
             var psi = new ProcessStartInfo
             {
                 FileName = AppName,
@@ -260,6 +264,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
             {
                 directory = Directory;
             }
+
+            System.IO.Directory.CreateDirectory(directory);
 
             var psi = new ProcessStartInfo
             {
@@ -323,6 +329,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
             {
                 directory = Directory;
             }
+
+            System.IO.Directory.CreateDirectory(directory);
 
             var psi = new ProcessStartInfo
             {

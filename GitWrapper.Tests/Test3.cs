@@ -136,6 +136,26 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             }
         }
 
+        private static void RemoveDirectory(string path)
+        {
+            var dir = new DirectoryInfo(path);
+
+            if (dir.Exists)
+            {
+                var files = System.IO.Directory.EnumerateFiles(
+                    dir.FullName,
+                    "*",
+                    SearchOption.AllDirectories);
+
+                foreach (var file in files)
+                {
+                    File.SetAttributes(file, FileAttributes.Normal);
+                }
+
+                System.IO.Directory.Delete(dir.FullName, recursive: true);
+            }
+        }
+
         private static DirectoryInfo MirrorDirectory(string url)
         {
             string repoName = Path.GetFileNameWithoutExtension(url);
@@ -615,5 +635,51 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             Assert.AreEqual(128, dto.ExitCode);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
         }
+
+#pragma warning disable IDE0059 // Unnecessary assignment of a value, but this is an example
+
+        [TestMethod]
+        public async Task Test_Example6()
+        {
+            var dir1 = "./d1";
+            var dir2 = "./d2";
+            RemoveDirectory(dir1);
+            RemoveDirectory(dir2);
+            Assert.IsFalse(Directory.Exists(dir1));
+            Assert.IsFalse(Directory.Exists(dir2));
+
+
+
+            var git1 = GitWrapperFactory.Create();
+            var git2 = GitWrapperFactory.Create();
+
+            await git1.ExtractArchiveAsync();
+            await git2.ExtractArchiveAsync();
+
+            var auth = new GitAuthenticationBase();
+            auth.SetSsh(_configData!.SshFilePwProtected, _configData.SshFilePassword);
+
+            git1.Authentication = auth;
+            git2.Authentication = auth;
+            
+            git1.Credential = Credentials.Ssh;
+            git2.Credential = Credentials.Ssh;
+
+            var dto1 = await git1.MirrorAsync(_configData.PrivateRepoSsh, dir1);
+            var dto2 = await git2.MirrorAsync(_configData.PrivateRepoSsh, dir2);
+
+
+
+            Assert.AreEqual(0, dto1.ExitCode);
+            Assert.IsTrue(Directory.Exists(Path.Combine(dir1, MirrorDirectory(_configData.PrivateRepoSsh).Name)));
+            Assert.AreEqual(0, dto2.ExitCode);
+            Assert.IsTrue(Directory.Exists(Path.Combine(dir1, MirrorDirectory(_configData.PrivateRepoSsh).Name)));
+
+            RemoveDirectory(dir1);
+            RemoveDirectory(dir2);
+        }
+
+#pragma warning restore IDE0059
+
     }
 }

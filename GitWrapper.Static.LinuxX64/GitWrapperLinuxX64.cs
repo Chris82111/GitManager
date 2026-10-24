@@ -17,7 +17,7 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
         public override string AppName { get; protected set; } = "";
 
         /// <inheritdoc/>
-        public override string? SshPassphrase { get; protected set; } = LibSshHelperPaths.FileRelative;
+        public override string? SshPassphrase { get; protected set; } = Path.Combine(AppContext.BaseDirectory, LibSshHelperPaths.FileRelative);
 
         /// <inheritdoc cref="GitWrapperBase.Identifier"/>
         public static string ClassIdentifier { get; } = $"{OSPlatform.Linux}-{Architecture.X64}";
