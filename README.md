@@ -55,28 +55,7 @@ public void Test_Example1()
 }
 ```
 
-The following example shows a platform-specific implementation, in this case Windows 64-bit:
-
-```c#
-public void Test_Example2()
-{
-    var git = new GitWrapperWindowsX64();
-
-    git.ExtractArchive();
-
-    if (git.IsGitAvailable())
-    {
-        var version = git.GitVersion();
-
-        var dto = git.Mirror($"...");
-
-        if (0 != dto.ExitCode)
-        {
-            Console.WriteLine("Could not mirror.");
-        }
-    }
-}
-```
+More examples are listed here [EXAMPLES.md](./Docs/EXAMPLES.md).
 
 ## Build
 

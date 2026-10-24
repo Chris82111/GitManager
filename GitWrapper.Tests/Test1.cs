@@ -1,7 +1,9 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core;
+using Chris82111.GitManager.GitWrapper.Core.Authenticators;
 using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using Chris82111.GitManager.GitWrapper.Static.LinuxX64;
 using Chris82111.GitManager.GitWrapper.Static.WindowsX64;
+using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 
 namespace Chris82111.GitManager.GitWrapper.Tests
@@ -469,6 +471,43 @@ namespace Chris82111.GitManager.GitWrapper.Tests
                     Console.WriteLine("Could not mirror.");
                 }
             }
+        }
+
+        [TestMethod]
+        public void Test_Example3()
+        {
+            var git = GitWrapperFactory.Create();
+
+            git.ExtractArchive();
+            git.Credential = Credentials.Token;
+            git.Authentication.SetToken(null, "ghp_***");
+
+            var dto = git.Mirror($"...");
+        }
+
+        [TestMethod]
+        public void Test_Example4()
+        {
+            var git = GitWrapperFactory.Create();
+
+            git.ExtractArchive();
+            git.Credential = Credentials.Token;
+            git.Authentication.SetTokenFromEnvironment(null, "GIT_MANAGER_TOKEN");
+
+            var dto = git.Mirror($"...");
+        }
+
+        [TestMethod]
+        public void Test_Example5()
+        {
+            var git = GitWrapperFactory.Create();
+
+            git.ExtractArchive();
+            git.Credential = Credentials.Ssh;
+            git.Authentication.SetSsh("path/to/key/file", "theSecretPassphrase");
+
+            // git@github.com:USER/REPO.git
+            var dto = git.Mirror($"...");
         }
 
 #pragma warning restore IDE0059
