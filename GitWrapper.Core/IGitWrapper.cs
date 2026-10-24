@@ -1,6 +1,8 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core.Authenticators;
-
 using Chris82111.GitManager.GitWrapper.Core.Processes;
+using System.ComponentModel;
+using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace Chris82111.GitManager.GitWrapper.Core
 {
@@ -207,7 +209,20 @@ namespace Chris82111.GitManager.GitWrapper.Core
 
         #region Authentication
 
-#warning There is another option in Windows: running a batch file that launches a Bash shell. Or, in Linux: launching a Bash shell directly, @"GitManager\ReadSshPassphrase.cmd";
+        // Here is some additional information. A Bash script can also be used instead of a binary
+        // helper application. However, the implementation differs between Windows and Linux.
+        // Linux can execute a Bash script directly. On Windows, this does not work reliably
+        // because MinGW or an intermediate compatibility layer may convert the script path
+        // specified in the "SSH_ASKPASS" environment variable, preventing the script from being
+        // executed correctly. A possible workaround is to specify a Windows batch script in
+        // "SSH_ASKPASS" that invokes Bash explicitly. For example, the batch script could contain:
+        // <code>
+        // @echo off
+        // "C:\Program Files\Git\bin\bash.exe" "/c/Users/Chris82111/source/repos/GitManager/ssh-passphrase.sh"
+        // </code>
+        // However, it assumes that Git for Windows is installed and the path to "bash.exe" must be
+        // known and configured correctly. Therefore, this approach is not universally applicable.
+
         /// <summary>
         /// Contains a path to the utility that replaces the SSH agent, or null.
         /// </summary>

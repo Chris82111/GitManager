@@ -79,6 +79,13 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         void SetToken(string? username, string token);
 
         /// <summary>
+        /// Sets the login details required to use the token
+        /// </summary>
+        /// <param name="username">The username can be null; in that case, "oauth2" is used, which works on GitHub</param>
+        /// <param name="environmentVariableName">The name of the environment variable containing the token</param>
+        void SetTokenFromEnvironment(string? username, string environmentVariableName);
+
+        /// <summary>
         /// Deletes the token information
         /// </summary>
         void ClearToken();
@@ -114,12 +121,11 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// </summary>
         void ClearSsh();
 
-#warning Change object? to IGitWrapper none nullable and change desciption.
         /// <summary>
         /// This handler is called when the <see cref="IGitWrapper.Credential"/> property in the <see cref="IGitWrapper"/> class is assigned a new value.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">sender is of type <see cref="IGitWrapper"/> and is never null</param>
+        /// <param name="e">Contains information about the process</param>
         void CredentialChangedHandler(object? sender, CredentialChangedEventArgs e);
     }
 }

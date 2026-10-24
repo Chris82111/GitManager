@@ -502,6 +502,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         public GitWrapperBase()
         {
             _authentication = new GitAuthenticationBase();
+            _authentication.Connect(this);
         }
 
         private void OnCredentialChanged(Credentials previousCredential, Credentials credential)
