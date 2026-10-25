@@ -2,7 +2,6 @@
 using Chris82111.GitManager.GitWrapper.Core.Authenticators;
 using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
 using Chris82111.GitManager.GitWrapper.Core.Processes;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
@@ -647,14 +646,16 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             RemoveDirectory(dir2);
             Assert.IsFalse(Directory.Exists(dir1));
             Assert.IsFalse(Directory.Exists(dir2));
+            RemoveDirectory(".bin");
 
 
 
             var git1 = GitWrapperFactory.Create();
             var git2 = GitWrapperFactory.Create();
-
-            await git1.ExtractArchiveAsync();
-            await git2.ExtractArchiveAsync();
+            
+            await Task.WhenAll(
+                git1.ExtractArchiveAsync(),
+                git2.ExtractArchiveAsync());
 
             var auth = new GitAuthenticationBase();
             auth.SetSsh(_configData!.SshFilePwProtected, _configData.SshFilePassword);
@@ -664,9 +665,13 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             
             git1.Credential = Credentials.Ssh;
             git2.Credential = Credentials.Ssh;
+            
+            var results = await Task.WhenAll(
+                git1.MirrorAsync(_configData.PrivateRepoSsh, dir1),
+                git2.MirrorAsync(_configData.PrivateRepoSsh, dir2));
 
-            var dto1 = await git1.MirrorAsync(_configData.PrivateRepoSsh, dir1);
-            var dto2 = await git2.MirrorAsync(_configData.PrivateRepoSsh, dir2);
+            var dto1 = results[0];
+            var dto2 = results[1];
 
 
 

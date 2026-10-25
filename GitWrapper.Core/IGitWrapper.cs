@@ -1,8 +1,5 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core.Authenticators;
 using Chris82111.GitManager.GitWrapper.Core.Processes;
-using System.ComponentModel;
-using System.Numerics;
-using System.Text.RegularExpressions;
 
 namespace Chris82111.GitManager.GitWrapper.Core
 {

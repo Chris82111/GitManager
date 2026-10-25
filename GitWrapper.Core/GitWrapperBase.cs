@@ -44,6 +44,11 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <inheritdoc/>
         public virtual ExtractConditions ExtractConditions { get; set; } = ExtractConditions.IfDirectoryMissingOrEmpty;
 
+        /// <summary>
+        /// Synchronizes archive extraction across all instances.
+        /// </summary>
+        protected static readonly SemaphoreSlim _extractLock = new(1, 1);
+
         /// <inheritdoc/>
         public virtual bool IsSupported
         {
@@ -398,6 +403,30 @@ namespace Chris82111.GitManager.GitWrapper.Core
         public virtual async Task ExtractArchiveAsync(string? destination = null, ExtractConditions? extractConditions = null)
         {
             EnsureSupported();
+
+            // InitializingPaths(
+            //    destination,
+            //    ArchivePaths.ArchiveFileRelative,
+            //    ArchivePaths.ExecutableRelative);
+
+            // await _extractLock.WaitAsync();
+
+            // try
+            // {
+            //     if (await PrepareAndCheckExtractAsync(extractConditions))
+            //     {
+            //         extract code
+            //     }
+            // }
+            // finally
+            // {
+            //     _extractLock.Release();
+            // }
+
+            // ConfigureProcessStartInfo = processStartInfo =>
+            // {
+            //     var envVar = new ProcessEnvironmentVariable(processStartInfo);
+            // };
         }
 
         /// <inheritdoc/>

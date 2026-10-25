@@ -34,22 +34,31 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
                 ArchivePaths.ArchiveFileRelative,
                 ArchivePaths.ExecutableRelative);
 
-            if (await PrepareAndCheckExtractAsync(extractConditions))
-            {
-                if (false == File.Exists(ArchiveFile))
-                {
-                    throw new FileNotFoundException($"File was no found: {ArchiveFile}");
-                }
+            await _extractLock.WaitAsync();
 
-                if (".zip" != Path.GetExtension(ArchiveFile))
+            try
+            {
+                if (await PrepareAndCheckExtractAsync(extractConditions))
                 {
-                    throw new Exception($"File Extension must be '.zip'");
+                    if (false == File.Exists(ArchiveFile))
+                    {
+                        throw new FileNotFoundException($"File was no found: {ArchiveFile}");
+                    }
+
+                    if (".zip" != Path.GetExtension(ArchiveFile))
+                    {
+                        throw new Exception($"File Extension must be '.zip'");
+                    }
+
+                    await ArchiveHandler.ExtractZipToDirectoryAsync(
+                        ArchiveFile,
+                        RuntimeDirectory,
+                        overwriteFiles: true);
                 }
-            
-                await ArchiveHandler.ExtractZipToDirectoryAsync(
-                    ArchiveFile,
-                    RuntimeDirectory,
-                    overwriteFiles: true);
+            }
+            finally
+            {
+                _extractLock.Release();
             }
 
             ConfigureProcessStartInfo = processStartInfo =>

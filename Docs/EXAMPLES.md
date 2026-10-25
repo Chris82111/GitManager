@@ -81,9 +81,9 @@ public void Test_Example5()
 }
 ```
 
-## Example 6, Platform-Independent Implementation Authentication Reused
+## Example 6, Platform-Independent Implementation Authentication Reused And Parallel
 
-The following example shows a platform-independent implementation. In this example, authentication is assigned to several objects and is therefore reused:
+The following example shows a platform-independent implementation. In this example, authentication is assigned to several objects and is therefore reused. Asynchronous methods are used in such a way that they are executed in parallel:
 
 ```c#
 public async Task Test_Example6()
@@ -91,18 +91,24 @@ public async Task Test_Example6()
     var git1 = GitWrapperFactory.Create();
     var git2 = GitWrapperFactory.Create();
 
-    await git1.ExtractArchiveAsync();
-    await git2.ExtractArchiveAsync();
+    await Task.WhenAll(
+        git1.ExtractArchiveAsync(),
+        git2.ExtractArchiveAsync());
 
     var auth = new GitAuthenticationBase();
-    auth.SetSsh(_configData!.SshFilePwProtected, _configData.SshFilePassword);
+    auth.SetSsh("path/to/key/file", "theSecretPassphrase");
 
     git1.Authentication = auth;
     git2.Authentication = auth;
-    
+
     git1.Credential = Credentials.Ssh;
     git2.Credential = Credentials.Ssh;
 
-    var dto1 = await git1.MirrorAsync($"...", dir1);
-    var dto2 = await git2.MirrorAsync($"...", dir2);
+    var results = await Task.WhenAll(
+        git1.MirrorAsync($"...", dir1),
+        git2.MirrorAsync($"...", dir2));
+
+    var dto1 = results[0];
+    var dto2 = results[1];
+}
 ```

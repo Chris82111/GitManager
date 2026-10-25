@@ -35,26 +35,35 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
                 ArchivePaths.ArchiveFileRelative,
                 ArchivePaths.ExecutableRelative);
 
-            if (await PrepareAndCheckExtractAsync(extractConditions))
+            await _extractLock.WaitAsync();
+
+            try
             {
-                if (false == File.Exists(ArchiveFile))
+                if (await PrepareAndCheckExtractAsync(extractConditions))
                 {
-                    throw new FileNotFoundException($"File was no found: {ArchiveFile}");
+                    if (false == File.Exists(ArchiveFile))
+                    {
+                        throw new FileNotFoundException($"File was no found: {ArchiveFile}");
+                    }
+
+                    if (false == PathHelper.IsExtension(ArchiveFile, ".tar.gz"))
+                    {
+                        throw new Exception($"File Extension must be '.tar.gz'");
+                    }
+
+                    SymlinkHelper.EnsureSymlinkSupported(RuntimeDirectory);
+
+                    await ArchiveHandler.ExtractTarGzToDirectoryAsync(
+                        ArchiveFile,
+                        RuntimeDirectory,
+                        overwriteFiles: true);
+
+                    CheckIfMoved();
                 }
-
-                if (false == PathHelper.IsExtension(ArchiveFile, ".tar.gz"))
-                {
-                    throw new Exception($"File Extension must be '.tar.gz'");
-                }
-
-                SymlinkHelper.EnsureSymlinkSupported(RuntimeDirectory);
-
-                await ArchiveHandler.ExtractTarGzToDirectoryAsync(
-                    ArchiveFile,
-                    RuntimeDirectory,
-                    overwriteFiles: true);
-
-                CheckIfMoved();
+            }
+            finally
+            {
+                _extractLock.Release();
             }
 
             ConfigureProcessStartInfo = processStartInfo =>
