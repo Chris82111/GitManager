@@ -1,4 +1,4 @@
-﻿namespace Chris82111.GitManager.GitWrapper.Core
+﻿namespace Chris82111.GitManager.GitWrapper.Core.Processes
 {
     /// <summary>
     /// Data transfer object for passing on information about the system processes used.

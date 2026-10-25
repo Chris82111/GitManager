@@ -1,4 +1,6 @@
-﻿using Chris82111.GitManager.GitWrapper.Core.Helpers;
+﻿using Chris82111.GitManager.GitWrapper.Core.Authenticators;
+using Chris82111.GitManager.GitWrapper.Core.Helpers;
+using Chris82111.GitManager.GitWrapper.Core.Processes;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
@@ -9,6 +11,15 @@ namespace Chris82111.GitManager.GitWrapper.Core
     /// </summary>
     public abstract class GitWrapperBase : IGitWrapper
     {
+        /// <inheritdoc/>
+        public event EventHandler<ProcessEventArgs>? BeforeProcessStart;
+
+        /// <inheritdoc/>
+        public event EventHandler<ProcessResultsEventArgs>? ProcessCompleted;
+
+        /// <inheritdoc/>
+        public event EventHandler? AfterProcessEnd;
+
         /// <inheritdoc/>
         public abstract string AppName { get; protected set; }
 
@@ -32,6 +43,11 @@ namespace Chris82111.GitManager.GitWrapper.Core
 
         /// <inheritdoc/>
         public virtual ExtractConditions ExtractConditions { get; set; } = ExtractConditions.IfDirectoryMissingOrEmpty;
+
+        /// <summary>
+        /// Synchronizes archive extraction across all instances.
+        /// </summary>
+        protected static readonly SemaphoreSlim _extractLock = new(1, 1);
 
         /// <inheritdoc/>
         public virtual bool IsSupported
@@ -119,6 +135,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 directory = Directory;
             }
 
+            System.IO.Directory.CreateDirectory(directory);
+
             var psi = new ProcessStartInfo
             {
                 FileName = AppName,
@@ -130,27 +148,44 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 CreateNoWindow = true
             };
 
-            psi.Environment["GIT_ASKPASS"] = "echo";
-
             ConfigureProcessStartInfo?.Invoke(psi);
 
-            var process = new Process { StartInfo = psi };
+            using var process = new Process { StartInfo = psi };
 
             if (null == process)
             {
                 return processResults;
             }
 
-            process.Start();
+            try
+            {
+                OnBeforeProcessStart(process);
+                process.Start();
 
-            processResults.StandardOutput = process.StandardOutput.ReadToEnd().TrimEnd('\n').TrimEnd('\r'); ;
-            processResults.StandardError = process.StandardError.ReadToEnd().TrimEnd('\n').TrimEnd('\r'); ;
+                var standardOutputTask = Task.Run(() => process.StandardOutput.ReadToEnd());
+                var standardErrorTask = Task.Run(() => process.StandardError.ReadToEnd());
 
-            process.WaitForExit();
+                Task.WaitAll(standardOutputTask, standardErrorTask);
 
-            processResults.ExitCode = process.ExitCode;
+                processResults.StandardOutput = standardOutputTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
 
-            return processResults;
+                processResults.StandardError = standardErrorTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
+
+                process.WaitForExit();
+
+                processResults.ExitCode = process.ExitCode;
+                OnProcessCompleted(processResults);
+
+                return processResults;
+            }
+            finally
+            {
+                OnAfterProcessEnd();
+            }
         }
 
         /// <inheritdoc/>
@@ -172,6 +207,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 directory = Directory;
             }
 
+            System.IO.Directory.CreateDirectory(directory);
+
             var psi = new ProcessStartInfo
             {
                 FileName = AppName,
@@ -183,27 +220,42 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 CreateNoWindow = true
             };
 
-            psi.Environment["GIT_ASKPASS"] = "echo";
-
             ConfigureProcessStartInfo?.Invoke(psi);
 
-            var process = new Process { StartInfo = psi };
+            using var process = new Process { StartInfo = psi };
 
             if (null == process)
             {
                 return processResults;
             }
 
-            process.Start();
-            
-            processResults.StandardOutput = (await process.StandardOutput.ReadToEndAsync()).TrimEnd('\n').TrimEnd('\r');
-            processResults.StandardError = (await process.StandardError.ReadToEndAsync()).TrimEnd('\n').TrimEnd('\r');
+            try
+            {
+                OnBeforeProcessStart(process);
+                process.Start();
 
-            await process.WaitForExitAsync();
+                var standardOutputTask = process.StandardOutput.ReadToEndAsync();
+                var standardErrorTask = process.StandardError.ReadToEndAsync();
 
-            processResults.ExitCode = process.ExitCode;
+                await Task.WhenAll(standardOutputTask, standardErrorTask);
 
-            return processResults;
+                processResults.StandardOutput = standardOutputTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
+
+                processResults.StandardError = standardErrorTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
+
+                processResults.ExitCode = process.ExitCode;
+                OnProcessCompleted(processResults);
+
+                return processResults;
+            }
+            finally
+            {
+                OnAfterProcessEnd();
+            }
         }
 
         /// <inheritdoc/>
@@ -218,6 +270,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 directory = Directory;
             }
 
+            System.IO.Directory.CreateDirectory(directory);
+
             var psi = new ProcessStartInfo
             {
                 FileName = fileName,
@@ -229,27 +283,44 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 CreateNoWindow = true
             };
 
-            psi.Environment["GIT_ASKPASS"] = "echo";
-
             ConfigureProcessStartInfo?.Invoke(psi);
 
-            var process = new Process { StartInfo = psi };
+            using var process = new Process { StartInfo = psi };
 
             if (null == process)
             {
                 return processResults;
             }
 
-            process.Start();
+            try
+            {
+                OnBeforeProcessStart(process);
+                process.Start();
 
-            processResults.StandardOutput = process.StandardOutput.ReadToEnd().TrimEnd('\n').TrimEnd('\r');
-            processResults.StandardError = process.StandardError.ReadToEnd().TrimEnd('\n').TrimEnd('\r');
+                var standardOutputTask = Task.Run(() => process.StandardOutput.ReadToEnd());
+                var standardErrorTask = Task.Run(() => process.StandardError.ReadToEnd());
 
-            process.WaitForExit();
+                Task.WaitAll(standardOutputTask, standardErrorTask);
 
-            processResults.ExitCode = process.ExitCode;
+                processResults.StandardOutput = standardOutputTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
 
-            return processResults;
+                processResults.StandardError = standardErrorTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
+
+                process.WaitForExit();
+
+                processResults.ExitCode = process.ExitCode;
+                OnProcessCompleted(processResults);
+
+                return processResults;
+            }
+            finally
+            {
+                OnAfterProcessEnd();
+            }
         }
 
         /// <inheritdoc/>
@@ -264,6 +335,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 directory = Directory;
             }
 
+            System.IO.Directory.CreateDirectory(directory);
+
             var psi = new ProcessStartInfo
             {
                 FileName = fileName,
@@ -275,27 +348,42 @@ namespace Chris82111.GitManager.GitWrapper.Core
                 CreateNoWindow = true
             };
 
-            psi.Environment["GIT_ASKPASS"] = "echo";
-
             ConfigureProcessStartInfo?.Invoke(psi);
 
-            var process = new Process { StartInfo = psi };
+            using var process = new Process { StartInfo = psi };
 
             if (null == process)
             {
                 return processResults;
             }
 
-            process.Start();
-            
-            processResults.StandardOutput = (await process.StandardOutput.ReadToEndAsync()).TrimEnd('\n').TrimEnd('\r');
-            processResults.StandardError = (await process.StandardError.ReadToEndAsync()).TrimEnd('\n').TrimEnd('\r');
+            try
+            {
+                OnBeforeProcessStart(process);
+                process.Start();
 
-            await process.WaitForExitAsync();
+                var standardOutputTask = process.StandardOutput.ReadToEndAsync();
+                var standardErrorTask = process.StandardError.ReadToEndAsync();
 
-            processResults.ExitCode = process.ExitCode;
+                await Task.WhenAll(standardOutputTask, standardErrorTask);
 
-            return processResults;
+                processResults.StandardOutput = standardOutputTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
+
+                processResults.StandardError = standardErrorTask.Result
+                    .TrimEnd('\n')
+                    .TrimEnd('\r');
+
+                processResults.ExitCode = process.ExitCode;
+                OnProcessCompleted(processResults);
+
+                return processResults;
+            }
+            finally
+            {
+                OnAfterProcessEnd();
+            }
         }
 
         /// <inheritdoc/>
@@ -315,6 +403,30 @@ namespace Chris82111.GitManager.GitWrapper.Core
         public virtual async Task ExtractArchiveAsync(string? destination = null, ExtractConditions? extractConditions = null)
         {
             EnsureSupported();
+
+            // InitializingPaths(
+            //    destination,
+            //    ArchivePaths.ArchiveFileRelative,
+            //    ArchivePaths.ExecutableRelative);
+
+            // await _extractLock.WaitAsync();
+            // 
+            // try
+            // {
+            //     if (await PrepareAndCheckExtractAsync(extractConditions))
+            //     {
+            //         extract code
+            //     }
+            // }
+            // finally
+            // {
+            //     _extractLock.Release();
+            // }
+
+            // ConfigureProcessStartInfo = processStartInfo =>
+            // {
+            //     var envVar = new ProcessEnvironmentVariable(processStartInfo);
+            // };
         }
 
         /// <inheritdoc/>
@@ -374,6 +486,69 @@ namespace Chris82111.GitManager.GitWrapper.Core
 
             System.IO.Directory.Delete(runtimeDirectory, recursive: true);
         }
+
+
+        #region Authentication
+
+        /// <inheritdoc />
+        public event EventHandler<CredentialChangedEventArgs>? CredentialChanged;
+
+        /// <inheritdoc />
+        public abstract string? SshPassphrase { get; protected set; }
+
+        /// <summary>
+        /// Holds the object reference; see <see cref="GitWrapperBase.Authentication"/>
+        /// </summary>
+        protected IGitAuthentication _authentication;
+
+        /// <inheritdoc />
+        public IGitAuthentication Authentication
+        { 
+            get => _authentication;
+            set
+            {
+                _authentication?.Disconnect(this);
+                _authentication = value;
+                _authentication?.Connect(this);
+            }
+        }
+
+        /// <summary>
+        /// Holds the object reference; see <see cref="GitWrapperBase.Credential"/>
+        /// </summary>
+        protected Credentials _credential = Credentials.Default;
+
+        /// <inheritdoc />
+        public Credentials Credential
+        {
+            get => _credential;
+            set
+            {
+                if(_credential != value)
+                {
+                    var oldCredential = _credential;
+                    _credential = value;
+                    OnCredentialChanged(oldCredential, value);
+                }
+            } 
+        }
+
+        /// <summary>
+        /// Base class constructor that creates a default instance of <see cref="GitAuthenticationBase"/>.
+        /// </summary>
+        public GitWrapperBase()
+        {
+            _authentication = new GitAuthenticationBase();
+            _authentication.Connect(this);
+        }
+
+        private void OnCredentialChanged(Credentials previousCredential, Credentials credential)
+        {
+            CredentialChanged?.Invoke(this, new CredentialChangedEventArgs(previousCredential, credential));
+        }
+
+        #endregion
+
 
         /// <summary>
         ///         Determines the required paths to the directories and the application to be launched.
@@ -511,6 +686,21 @@ namespace Chris82111.GitManager.GitWrapper.Core
             }
 
             return extract;
+        }
+        
+        private void OnBeforeProcessStart(Process process)
+        {
+            BeforeProcessStart?.Invoke(this, new ProcessEventArgs(process));
+        }
+
+        private void OnProcessCompleted(ProcessResultsDto processResults)
+        {
+            ProcessCompleted?.Invoke(this, new ProcessResultsEventArgs(processResults));
+        }
+
+        private void OnAfterProcessEnd()
+        {
+            AfterProcessEnd?.Invoke(this, EventArgs.Empty);
         }
     }
 }

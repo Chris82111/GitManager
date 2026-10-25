@@ -1,0 +1,50 @@
+<Project>
+  
+  <PropertyGroup>
+    
+    <CurrentDirectoryFullName>$(MSBuildThisFileDirectory.TrimEnd('/').TrimEnd('\'))</CurrentDirectoryFullName>
+    
+    <CurrentDirectoryName>$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName('$(MSBuildThisFileDirectory)'))))</CurrentDirectoryName>
+    
+    
+    
+    <!-- This name must match the current directory and should serve as a prefix for every XML tag -->
+    <DirectoryPrefix>LibSshHelper</DirectoryPrefix>
+    
+    <!-- Determines whether the runtime folder should be created in the output path based on the above conditions.  -->
+    <LibSshHelper_Use Condition="'$(LibSshHelper_Use)' == 'true' Or '$(IsAnyRid)' == 'true' Or '$(IsEmptyRid)' == 'true' Or '$(IsWindowsX64)' == 'true'" >true</LibSshHelper_Use>
+    <LibSshHelper_Use Condition="'$(LibSshHelper_Use)' != 'true'">false</LibSshHelper_Use>
+    
+    
+    
+    <!-- runtimes/win-x64/native -->
+    <LibSshHelper_RuntimeDirectory>$([System.IO.Path]::Combine('runtimes', 'win-x64', 'native'))</LibSshHelper_RuntimeDirectory>
+    
+    <!-- ssh-passphrase.exe -->
+    <LibSshHelper_Executable>ssh-passphrase.exe</LibSshHelper_Executable>
+    
+    <!-- LibSshHelperPaths.cs -->
+    <LibSshHelper_Paths>LibSshHelperPaths.cs</LibSshHelper_Paths>
+    
+    
+    
+    <!-- LibSshHelper/SshHelper.props -->
+    <LibSshHelper_LibRelative>$([System.IO.Path]::Combine('$(CurrentDirectoryName)', '$(MSBuildThisFile)'))</LibSshHelper_LibRelative>
+    
+    <!-- LibSshHelper/SshHelperPaths.cs -->
+    <LibSshHelper_PathsRelative>$([System.IO.Path]::Combine('$(CurrentDirectoryName)', '$(LibSshHelper_Paths)'))</LibSshHelper_PathsRelative>
+    
+    <!-- SshHelperPaths -->
+    <LibSshHelper_PathsClass>$([System.IO.Path]::GetFileName($([System.IO.Path]::GetFileNameWithoutExtension('$(LibSshHelper_Paths)'))))</LibSshHelper_PathsClass>
+    
+    <!-- LibSshHelper/ssh-passphrase.exe -->
+    <LibSshHelper_InPathsRelative>$([System.IO.Path]::Combine('$(CurrentDirectoryName)', '$(LibSshHelper_Executable)'))</LibSshHelper_InPathsRelative>
+    
+    <!-- runtimes/win-x64/native/ssh-passphrase.exe -->
+    <LibSshHelper_ExecutableRelative>$([System.IO.Path]::Combine('$(LibSshHelper_RuntimeDirectory)', '$(LibSshHelper_Executable)'))</LibSshHelper_ExecutableRelative>
+    
+    <LibSshHelper_LinuxStyleExecutableRelativePathFromLib>./../$(LibSshHelper_RuntimeDirectory.Replace('\', '/'))</LibSshHelper_LinuxStyleExecutableRelativePathFromLib>
+  
+  </PropertyGroup>
+
+</Project>

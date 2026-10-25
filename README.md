@@ -55,32 +55,19 @@ public void Test_Example1()
 }
 ```
 
-The following example shows a platform-specific implementation, in this case Windows 64-bit:
-
-```c#
-public void Test_Example2()
-{
-    var git = new GitWrapperWindowsX64();
-
-    git.ExtractArchive();
-
-    if (git.IsGitAvailable())
-    {
-        var version = git.GitVersion();
-
-        var dto = git.Mirror($"...");
-
-        if (0 != dto.ExitCode)
-        {
-            Console.WriteLine("Could not mirror.");
-        }
-    }
-}
-```
+More examples are listed here [EXAMPLES.md](./Docs/EXAMPLES.md).
 
 ## Build
 
 The [BUILD.md](./Docs/BUILD.md) section is only relevant to developers or people who will be build this repository.
+
+## Security Considerations
+
+GitManager pass sensitive credentials, such as tokens and SSH passphrases, to Git through environment variables of the started process. 
+This avoids exposing the credentials as command-line arguments, but environment variables are not a secure secret store. Depending on the operating system and the privileges available to other processes, the environment of a running process may potentially be inspected by other software, debugging tools, or malicious processes.
+Use GitManager only in a trusted environment and protect the machine and user account from unauthorized access. If a token or SSH passphrase is compromised, revoke or replace the affected credential immediately.
+
+Password Storage: Passwords are currently stored as string instances in memory. Since strings are immutable, they cannot be reliably erased from memory, and sensitive data may remain accessible until garbage collection reclaims it.
 
 ## License
 

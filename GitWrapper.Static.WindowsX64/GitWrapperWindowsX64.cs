@@ -1,8 +1,8 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core;
 using Chris82111.GitManager.GitWrapper.Core.Archives;
 using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
-using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using Chris82111.GitManager.GitWrapper.Static.WindowsX64.Lib;
+using Chris82111.GitManager.GitWrapper.Static.WindowsX64.LibSshHelper;
 using System.Runtime.InteropServices;
 
 namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
@@ -14,6 +14,9 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
    {
         /// <inheritdoc/>
         public override string AppName { get; protected set; } = "";
+
+        /// <inheritdoc/>
+        public override string? SshPassphrase { get; protected set; } = Path.Combine(AppContext.BaseDirectory, LibSshHelperPaths.FileRelative);
 
         /// <inheritdoc cref="GitWrapperBase.Identifier"/>
         public static string ClassIdentifier { get; } = $"{OSPlatform.Windows}-{Architecture.X64}";
@@ -31,22 +34,31 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
                 ArchivePaths.ArchiveFileRelative,
                 ArchivePaths.ExecutableRelative);
 
-            if (await PrepareAndCheckExtractAsync(extractConditions))
-            {
-                if (false == File.Exists(ArchiveFile))
-                {
-                    throw new FileNotFoundException($"File was no found: {ArchiveFile}");
-                }
+            await _extractLock.WaitAsync();
 
-                if (".zip" != Path.GetExtension(ArchiveFile))
+            try
+            {
+                if (await PrepareAndCheckExtractAsync(extractConditions))
                 {
-                    throw new Exception($"File Extension must be '.zip'");
+                    if (false == File.Exists(ArchiveFile))
+                    {
+                        throw new FileNotFoundException($"File was no found: {ArchiveFile}");
+                    }
+
+                    if (".zip" != Path.GetExtension(ArchiveFile))
+                    {
+                        throw new Exception($"File Extension must be '.zip'");
+                    }
+
+                    await ArchiveHandler.ExtractZipToDirectoryAsync(
+                        ArchiveFile,
+                        RuntimeDirectory,
+                        overwriteFiles: true);
                 }
-            
-                await ArchiveHandler.ExtractZipToDirectoryAsync(
-                    ArchiveFile,
-                    RuntimeDirectory,
-                    overwriteFiles: true);
+            }
+            finally
+            {
+                _extractLock.Release();
             }
 
             ConfigureProcessStartInfo = processStartInfo =>

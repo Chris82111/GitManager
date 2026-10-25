@@ -3,6 +3,7 @@ using Chris82111.GitManager.GitWrapper.Core.Archives;
 using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
 using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using Chris82111.GitManager.GitWrapper.Static.LinuxX64.Lib;
+using Chris82111.GitManager.GitWrapper.Static.LinuxX64.LibSshHelper;
 using System.Runtime.InteropServices;
 
 namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
@@ -14,6 +15,9 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
     {
         /// <inheritdoc/>
         public override string AppName { get; protected set; } = "";
+
+        /// <inheritdoc/>
+        public override string? SshPassphrase { get; protected set; } = Path.Combine(AppContext.BaseDirectory, LibSshHelperPaths.FileRelative);
 
         /// <inheritdoc cref="GitWrapperBase.Identifier"/>
         public static string ClassIdentifier { get; } = $"{OSPlatform.Linux}-{Architecture.X64}";
@@ -31,26 +35,35 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
                 ArchivePaths.ArchiveFileRelative,
                 ArchivePaths.ExecutableRelative);
 
-            if (await PrepareAndCheckExtractAsync(extractConditions))
+            await _extractLock.WaitAsync();
+
+            try
             {
-                if (false == File.Exists(ArchiveFile))
+                if (await PrepareAndCheckExtractAsync(extractConditions))
                 {
-                    throw new FileNotFoundException($"File was no found: {ArchiveFile}");
+                    if (false == File.Exists(ArchiveFile))
+                    {
+                        throw new FileNotFoundException($"File was no found: {ArchiveFile}");
+                    }
+
+                    if (false == PathHelper.IsExtension(ArchiveFile, ".tar.gz"))
+                    {
+                        throw new Exception($"File Extension must be '.tar.gz'");
+                    }
+
+                    SymlinkHelper.EnsureSymlinkSupported(RuntimeDirectory);
+
+                    await ArchiveHandler.ExtractTarGzToDirectoryAsync(
+                        ArchiveFile,
+                        RuntimeDirectory,
+                        overwriteFiles: true);
+
+                    CheckIfMoved();
                 }
-
-                if (false == PathHelper.IsExtension(ArchiveFile, ".tar.gz"))
-                {
-                    throw new Exception($"File Extension must be '.tar.gz'");
-                }
-
-                SymlinkHelper.EnsureSymlinkSupported(RuntimeDirectory);
-
-                await ArchiveHandler.ExtractTarGzToDirectoryAsync(
-                    ArchiveFile,
-                    RuntimeDirectory,
-                    overwriteFiles: true);
-
-                CheckIfMoved();
+            }
+            finally
+            {
+                _extractLock.Release();
             }
 
             ConfigureProcessStartInfo = processStartInfo =>
