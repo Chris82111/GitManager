@@ -236,8 +236,9 @@ namespace Chris82111.GitManager.GitWrapper.Core
 
                 var standardOutputTask = process.StandardOutput.ReadToEndAsync();
                 var standardErrorTask = process.StandardError.ReadToEndAsync();
+                var processExitTask = process.WaitForExitAsync();
 
-                await Task.WhenAll(standardOutputTask, standardErrorTask);
+                await Task.WhenAll(standardOutputTask, standardErrorTask, processExitTask);
 
                 processResults.StandardOutput = standardOutputTask.Result
                     .TrimEnd('\n')
@@ -364,8 +365,9 @@ namespace Chris82111.GitManager.GitWrapper.Core
 
                 var standardOutputTask = process.StandardOutput.ReadToEndAsync();
                 var standardErrorTask = process.StandardError.ReadToEndAsync();
+                var processExitTask = process.WaitForExitAsync();
 
-                await Task.WhenAll(standardOutputTask, standardErrorTask);
+                await Task.WhenAll(standardOutputTask, standardErrorTask, processExitTask);
 
                 processResults.StandardOutput = standardOutputTask.Result
                     .TrimEnd('\n')
