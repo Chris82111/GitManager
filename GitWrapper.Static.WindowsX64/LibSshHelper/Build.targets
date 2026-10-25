@@ -19,11 +19,12 @@
     <Message
       Text="SSH helper: Preparing $(LibSshHelper_ExecutableRelative)"
       Importance="high" />
-    
+
     <Exec
-      Command="$(DockerCmd) buildx build --output type=local,dest=&quot;$(CurrentDirectoryName)&quot; &quot;$(CurrentDirectoryName)&quot;"
+      Command="mkdir -p &quot;$(CurrentDirectoryName)&quot; &amp;&amp; $(DockerCmd) buildx build --output type=tar,dest=- &quot;$(CurrentDirectoryName)&quot; | tar -xf - -C &quot;$(CurrentDirectoryName)&quot;"
       WorkingDirectory="$(LibSshHelper_LibDirectory)"
       Condition="'$(LibSshHelper_Use)' == 'true' And !Exists('$(LibSshHelper_ExecutableRelative)')" />
+    
     
     <Move
       SourceFiles="$(LibSshHelper_InPathsRelative)"
