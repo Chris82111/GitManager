@@ -410,7 +410,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
             //    ArchivePaths.ExecutableRelative);
 
             // await _extractLock.WaitAsync();
-
+            // 
             // try
             // {
             //     if (await PrepareAndCheckExtractAsync(extractConditions))

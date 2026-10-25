@@ -126,15 +126,19 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         protected string? _environmentVariableName = null;
 
         /// <inheritdoc />
-        public bool IsTokenValid()
+        public bool IsTokenValid(IGitWrapper gitWrapper)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            var invalid = string.IsNullOrWhiteSpace(_username) ||
-                ( string.IsNullOrWhiteSpace(_token) &&
-                  string.IsNullOrWhiteSpace(_environmentVariableName));
-
-            return !invalid;
+            switch (gitWrapper.Credential)
+            {
+                case Credentials.Token:
+                    return !(string.IsNullOrWhiteSpace(_username) || string.IsNullOrWhiteSpace(_token));
+                case Credentials.TokenFromEnvironment:
+                    return !(string.IsNullOrWhiteSpace(_username) || string.IsNullOrWhiteSpace(_environmentVariableName));
+                default:
+                    return false;
+            }
         }
 
         /// <inheritdoc />
@@ -220,7 +224,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            IGitWrapper gitWrapper = (IGitWrapper)sender!;
+            var gitWrapper = (IGitWrapper)sender!;
 
             // Reset
             switch (e.PreviousCredential)
@@ -234,6 +238,10 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
                 case Credentials.Token:
                     gitWrapper.BeforeProcessStart -= AuthenticationToken;
+                    break;
+
+                case Credentials.TokenFromEnvironment:
+                    gitWrapper.BeforeProcessStart -= AuthenticationTokenFromEnvironment;
                     break;
 
                 case Credentials.UserAction:
@@ -264,6 +272,10 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
                 case Credentials.Token:
                     gitWrapper.BeforeProcessStart += AuthenticationToken;
+                    break;
+
+                case Credentials.TokenFromEnvironment:
+                    gitWrapper.BeforeProcessStart += AuthenticationTokenFromEnvironment;
                     break;
 
                 case Credentials.UserAction:
@@ -329,11 +341,13 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// <param name="e">Contains information about the process</param>
         protected virtual void AuthenticationToken(object? sender, ProcessEventArgs e)
         {
+            var gitWrapper = (IGitWrapper)sender!;
+
             var envVar = new ProcessEnvironmentVariable(e.Process.StartInfo);
 
-            if (false == IsTokenValid())
+            if (false == IsTokenValid(gitWrapper))
             {
-                throw new NullReferenceException($"Error with internal stored username and/or token call the methode '{nameof(SetToken)}' first.");
+                throw new NullReferenceException($"Error with internal stored username and/or token, call the methode '{nameof(SetToken)}' first.");
             }
 
             // Disable inherited credential helpers.
@@ -344,19 +358,46 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
             envVar.Set("GIT_CONFIG_KEY_1", "credential.helper");
 
-            string helper;
-            if (null != _token)
+            var helper =
+                $"!f() {{ printf 'username=%s\\npassword=%s\\n\\n' " +
+                $"{ShellQuote(_username ?? string.Empty)} {ShellQuote(_token ?? string.Empty)}; }}; f";
+            
+            envVar.Set("GIT_CONFIG_VALUE_1", helper);
+        }
+
+        /// <summary>
+        ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
+        /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
+        /// <br/>   behaviour accordingly.
+        /// <br/>   
+        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.Token"/>:
+        /// <br/>   <inheritdoc cref="Credentials.Token"/>
+        /// </summary>
+        /// <param name="sender">sender is of type <see cref="IGitWrapper"/> and is never null</param>
+        /// <param name="e">Contains information about the process</param>
+        protected virtual void AuthenticationTokenFromEnvironment(object? sender, ProcessEventArgs e)
+        {
+            var gitWrapper = (IGitWrapper)sender!;
+
+            var envVar = new ProcessEnvironmentVariable(e.Process.StartInfo);
+
+            if (false == IsTokenValid(gitWrapper))
             {
-                helper =
-                    $"!f() {{ printf 'username=%s\\npassword=%s\\n\\n' " +
-                    $"{ShellQuote(_username ?? string.Empty)} {ShellQuote(_token ?? string.Empty)}; }}; f";
+                throw new NullReferenceException($"Error with internal stored username and/or token environment variable name, call the methode '{nameof(SetTokenFromEnvironment)}' first.");
             }
-            else
-            {
-                helper =
-                    $"!f() {{ printf 'username=%s\\npassword=%s\\n\\n' " +
-                    $"{ShellQuote(_username) ?? string.Empty} \"${{{_environmentVariableName}}}\"; }}; f";
-            }
+
+            // Disable inherited credential helpers.
+            envVar.Set("GIT_CONFIG_COUNT", "2");
+
+            envVar.Set("GIT_CONFIG_KEY_0", "credential.helper");
+            envVar.Set("GIT_CONFIG_VALUE_0", string.Empty);
+
+            envVar.Set("GIT_CONFIG_KEY_1", "credential.helper");
+
+            var helper =
+                $"!f() {{ printf 'username=%s\\npassword=%s\\n\\n' " +
+                $"{ShellQuote(_username) ?? string.Empty} \"${{{_environmentVariableName}}}\"; }}; f";
+            
             envVar.Set("GIT_CONFIG_VALUE_1", helper);
         }
 

@@ -56,7 +56,7 @@ public void Test_Example4()
     var git = GitWrapperFactory.Create();
 
     git.ExtractArchive();
-    git.Credential = Credentials.Token;
+    git.Credential = Credentials.TokenFromEnvironment;
     git.Authentication.SetTokenFromEnvironment(null, "GIT_MANAGER_TOKEN");
 
     var dto = git.Mirror($"...");    

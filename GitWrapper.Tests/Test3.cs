@@ -167,7 +167,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         {
             var git = EnsureGitWrapper();
 
-            Assert.HasCount(6, Enum.GetNames<Credentials>());
+            Assert.HasCount(7, Enum.GetNames<Credentials>());
 
             Assert.AreEqual(Credentials.Default, git.Credential);
 
@@ -176,6 +176,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             git.Credential = Credentials.Token;
             Assert.AreEqual(Credentials.Token, git.Credential);
+
+            git.Credential = Credentials.TokenFromEnvironment;
+            Assert.AreEqual(Credentials.TokenFromEnvironment, git.Credential);
 
             git.Credential = Credentials.Nothing;
             Assert.AreEqual(Credentials.Nothing, git.Credential);
@@ -243,6 +246,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Credential = Credentials.Token;
             Assert.AreEqual(Credentials.Token, git.Credential);
 
+            git.Credential = Credentials.TokenFromEnvironment;
+            Assert.AreEqual(Credentials.TokenFromEnvironment, git.Credential);
+
             git.Credential = Credentials.Nothing;
             Assert.AreEqual(Credentials.Nothing, git.Credential);
 
@@ -290,9 +296,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             authentication.Dispose();
             Assert.AreEqual(0, authentication.DependentCount);
 
-            Assert.ThrowsExactly<ObjectDisposedException>(() => git1.Authentication.IsTokenValid());
-            Assert.ThrowsExactly<ObjectDisposedException>(() => git2.Authentication.IsTokenValid());
-            Assert.ThrowsExactly<ObjectDisposedException>(() => git3.Authentication.IsTokenValid());
+            Assert.ThrowsExactly<ObjectDisposedException>(() => git1.Authentication.IsTokenValid(git1));
+            Assert.ThrowsExactly<ObjectDisposedException>(() => git2.Authentication.IsTokenValid(git2));
+            Assert.ThrowsExactly<ObjectDisposedException>(() => git3.Authentication.IsTokenValid(git3));
         }
 
         [TestMethod]
@@ -316,6 +322,11 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Authentication = authentication;
             Assert.AreEqual(Credentials.Token, git.Credential);
 
+            git.Credential = Credentials.TokenFromEnvironment;
+            git.Authentication = null;
+            git.Authentication = authentication;
+            Assert.AreEqual(Credentials.TokenFromEnvironment, git.Credential);
+
             git.Credential = Credentials.Nothing;
             git.Authentication = null;
             git.Authentication = authentication;
@@ -353,6 +364,11 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             Assert.AreEqual(Credentials.Token, git.Credential);
 
             git.Authentication = null;
+            git.Credential = Credentials.TokenFromEnvironment;
+            git.Authentication = authentication;
+            Assert.AreEqual(Credentials.TokenFromEnvironment, git.Credential);
+
+            git.Authentication = null;
             git.Credential = Credentials.Nothing;
             git.Authentication = authentication;
             Assert.AreEqual(Credentials.Nothing, git.Credential);
@@ -387,6 +403,11 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Authentication = authentication;
             git.Credential = Credentials.Token;
             Assert.AreEqual(Credentials.Token, git.Credential);
+
+            git.Authentication = null;
+            git.Authentication = authentication;
+            git.Credential = Credentials.TokenFromEnvironment;
+            Assert.AreEqual(Credentials.TokenFromEnvironment, git.Credential);
 
             git.Authentication = null;
             git.Authentication = authentication;
@@ -507,7 +528,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             };
 
             git.Authentication.SetTokenFromEnvironment(_configData.Username, $"GIT_MANAGER_TOKEN");
-            git.Credential = Credentials.Token;
+            git.Credential = Credentials.TokenFromEnvironment;
             var dto = git.Mirror(_configData.PrivateRepo);
 
             Assert.AreEqual(0, dto.ExitCode);
@@ -635,8 +656,6 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
         }
 
-#pragma warning disable IDE0059 // Unnecessary assignment of a value, but this is an example
-
         [TestMethod]
         public async Task Test_Example6()
         {
@@ -683,8 +702,5 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             RemoveDirectory(dir1);
             RemoveDirectory(dir2);
         }
-
-#pragma warning restore IDE0059
-
     }
 }

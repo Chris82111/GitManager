@@ -69,7 +69,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// <returns>
         ///         true:  The information has been set correctly
         /// <br/>   false: The information has not been set correctly</returns>
-        bool IsTokenValid();
+        bool IsTokenValid(IGitWrapper gitWrapper);
 
         /// <summary>
         /// Sets the login details required to use the token

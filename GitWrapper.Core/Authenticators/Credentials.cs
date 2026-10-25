@@ -24,6 +24,12 @@
         Token,
 
         /// <summary>
+        ///         A username and a token (via a environment variable) are used for authentication.
+        /// <br/>   The function <see cref="IGitAuthentication.SetTokenFromEnvironment"/> must be used to set the data.
+        /// </summary>
+        TokenFromEnvironment,
+
+        /// <summary>
         ///         A custom action is used to configure authentication.
         /// <br/>   To do this, the action <see cref="IGitAuthentication.UserAction"/> must be assigned.
         /// </summary>
