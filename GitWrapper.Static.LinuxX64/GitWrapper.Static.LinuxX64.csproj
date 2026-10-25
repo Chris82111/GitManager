@@ -8,9 +8,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <AssemblyName>Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</AssemblyName>
+    <PackageId>Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</PackageId>
     <Version>1.0.0</Version>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <PackageId>Chris82111.$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</PackageId>
     <Authors>Chris82111</Authors>
     <Company>GitManager</Company>
     <RepositoryUrl>https://github.com/Chris82111/GitManager</RepositoryUrl>
