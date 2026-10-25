@@ -557,6 +557,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_12_SshWrongUrl()
         {
+            EnsureConfigData();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -577,6 +578,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_13_SshRightUrl()
         {
+            EnsureConfigData();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -597,6 +599,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_14_SshPassword()
         {
+            EnsureConfigData();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -615,6 +618,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_15_SshNoPassword()
         {
+            EnsureConfigData();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -631,6 +635,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_16_SshWrongPassword()
         {
+            EnsureConfigData();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -647,6 +652,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_17_SshSystem()
         {
+            EnsureConfigData();
             var git = new GitWrapperSystem();
             git.Credential = Credentials.Ssh;
             git.Authentication.SetSsh(_configData!.SshFilePwProtected, _configData.SshFilePassword);
@@ -659,6 +665,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public async Task Test_Example6()
         {
+            EnsureConfigData();
             var dir1 = "./d1";
             var dir2 = "./d2";
             RemoveDirectory(dir1);
