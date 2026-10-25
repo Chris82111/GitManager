@@ -81,7 +81,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             if (null == configData)
             {
-                _configErrorMessage = $"The configuration file could not be deserialised; please check the configuration file '{_configFile}'";
+                _configErrorMessage = $"The configuration file could not be deserialized; please check the configuration file '{_configFile}'";
             }
 
             _configData = configData;

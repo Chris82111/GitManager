@@ -3,7 +3,11 @@
     "ASKPASS",
     "beforefieldinit",
     "CAINFO",
+    "finalizer",
+    "GIT_CONFIG_NOSYSTEM",
     "libc",
-    "libexec"
+    "libexec",
+    "ssh-keygen",
+    "publickey"
   ]
 }
