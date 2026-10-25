@@ -1,0 +1,6 @@
+/*
+!/.gitignore
+!/*.props
+!/*.targets
+!/Dockerfile
+!/setup-git-env.sh
