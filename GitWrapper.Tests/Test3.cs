@@ -591,6 +591,12 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
 
             git.Authentication.SetSsh(_configData.SshFile, string.Empty);
+
+#warning find a better position for that
+            // var fileOk = git.Authentication.IsSshSecure();
+            // git.Authentication.SecureSshFile();
+            // fileOk = git.Authentication.IsSshSecure();
+
             dto = git.Mirror(_configData.PrivateRepoSsh);
             Assert.AreEqual(0, dto.ExitCode);
             Assert.IsTrue(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -607,9 +613,15 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Credential = Credentials.Ssh;
 
             git.Authentication.SetSsh(_configData.SshFilePwProtected, _configData.SshFilePassword);
+
+#warning find a better position for that
+            // var fileOk = git.Authentication.IsSshSecure();
+            // git.Authentication.SecureSshFile();
+            // fileOk = git.Authentication.IsSshSecure();
+            
             var dto = git.Mirror(_configData.PrivateRepoSsh);
 
-            //File.WriteAllText("log.txt", dto.StandardError);
+            File.WriteAllText("log.txt", dto.StandardError);
 
             Assert.AreEqual(0, dto.ExitCode);
             Assert.IsTrue(MirrorDirectory(_configData.PrivateRepoSsh).Exists);

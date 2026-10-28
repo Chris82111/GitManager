@@ -189,6 +189,62 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// </summary>
         protected string? _password = null;
 
+        public bool IsSshSecure()
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
+            if (!OperatingSystem.IsLinux() && !OperatingSystem.IsMacOS())
+            {
+                return true;
+            }
+
+            ArgumentNullException.ThrowIfNull(_filePath);
+
+            UnixFileMode mode = File.GetUnixFileMode(_filePath);
+
+            UnixFileMode forbidden =
+                UnixFileMode.GroupRead |
+                UnixFileMode.GroupWrite |
+                UnixFileMode.GroupExecute |
+                UnixFileMode.OtherRead |
+                UnixFileMode.OtherWrite |
+                UnixFileMode.OtherExecute;
+
+            return (mode & forbidden) == 0;
+        }
+
+        public void SecureSshFile()
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
+            ArgumentNullException.ThrowIfNull(_filePath);
+
+            if (!OperatingSystem.IsLinux() && !OperatingSystem.IsMacOS())
+            {
+                return;
+            }
+
+            File.SetUnixFileMode(
+                _filePath,
+                UnixFileMode.UserRead | UnixFileMode.UserWrite);
+        }
+
+        public static void Ssh()
+        {
+            // List:
+            // ssh-keygen -F github.com -f ~/.ssh/known_hosts
+
+            // Remove:
+            // ssh-keygen -R github.com -f ~/.ssh/known_hosts
+
+            // Test your file type:
+            // ssh-keygen -lf ./key
+
+            // Get servers key:
+            // ssh-keyscan -t ed25519 github.com
+        }
+
+
         /// <inheritdoc />
         public bool IsSshValid()
         {
