@@ -3,7 +3,6 @@ using Chris82111.GitManager.GitWrapper.Core.Authenticators;
 using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using Chris82111.GitManager.GitWrapper.Static.LinuxX64;
 using Chris82111.GitManager.GitWrapper.Static.WindowsX64;
-using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 
 namespace Chris82111.GitManager.GitWrapper.Tests

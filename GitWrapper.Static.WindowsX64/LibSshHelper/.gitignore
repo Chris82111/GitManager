@@ -1,0 +1,6 @@
+/*
+!/.gitignore
+!/*.props
+!/*.targets
+!/Dockerfile
+!/*.c

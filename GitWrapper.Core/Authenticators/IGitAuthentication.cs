@@ -90,6 +90,10 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// </summary>
         void ClearToken();
 
+        bool IsSshSecure();
+
+        void SecureSshFile();
+
         /// <summary>
         /// Returns whether the SSH information has been set correctly
         /// </summary>

@@ -22,5 +22,6 @@ RUN mkdir -p /out \
 FROM scratch
 COPY --from=build /out/ssh-passphrase /ssh-passphrase
 
-# Build with:
+# Use one of the two commands to create:
 # docker buildx build --platform linux/amd64 --output type=local,dest=./out .
+# mkdir -p ./out && docker buildx build --platform linux/amd64 --output type=tar,dest=- . | tar -xf - -C ./out/

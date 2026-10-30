@@ -189,6 +189,62 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// </summary>
         protected string? _password = null;
 
+        public bool IsSshSecure()
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
+            if (!OperatingSystem.IsLinux() && !OperatingSystem.IsMacOS())
+            {
+                return true;
+            }
+
+            ArgumentNullException.ThrowIfNull(_filePath);
+
+            UnixFileMode mode = File.GetUnixFileMode(_filePath);
+
+            UnixFileMode forbidden =
+                UnixFileMode.GroupRead |
+                UnixFileMode.GroupWrite |
+                UnixFileMode.GroupExecute |
+                UnixFileMode.OtherRead |
+                UnixFileMode.OtherWrite |
+                UnixFileMode.OtherExecute;
+
+            return (mode & forbidden) == 0;
+        }
+
+        public void SecureSshFile()
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
+            ArgumentNullException.ThrowIfNull(_filePath);
+
+            if (!OperatingSystem.IsLinux() && !OperatingSystem.IsMacOS())
+            {
+                return;
+            }
+
+            File.SetUnixFileMode(
+                _filePath,
+                UnixFileMode.UserRead | UnixFileMode.UserWrite);
+        }
+
+        public static void Ssh()
+        {
+            // List:
+            // ssh-keygen -F github.com -f ~/.ssh/known_hosts
+
+            // Remove:
+            // ssh-keygen -R github.com -f ~/.ssh/known_hosts
+
+            // Test your file type:
+            // ssh-keygen -lf ./key
+
+            // Get servers key:
+            // ssh-keyscan -t ed25519 github.com
+        }
+
+
         /// <inheritdoc />
         public bool IsSshValid()
         {
@@ -301,9 +357,9 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// <summary>
         ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
         /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
-        /// <br/>   behaviour accordingly.
+        /// <br/>   behavior accordingly.
         /// <br/>   
-        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.Nothing"/>:
+        /// <br/>   This authentication handler implements the behavior of <see cref="Credentials.Nothing"/>:
         /// <br/>   <inheritdoc cref="Credentials.Nothing"/>
         /// </summary>
         /// <param name="sender">sender is of type <see cref="IGitWrapper"/> and is never null</param>
@@ -332,9 +388,9 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// <summary>
         ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
         /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
-        /// <br/>   behaviour accordingly.
+        /// <br/>   behavior accordingly.
         /// <br/>   
-        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.Token"/>:
+        /// <br/>   This authentication handler implements the behavior of <see cref="Credentials.Token"/>:
         /// <br/>   <inheritdoc cref="Credentials.Token"/>
         /// </summary>
         /// <param name="sender">sender is of type <see cref="IGitWrapper"/> and is never null</param>
@@ -347,7 +403,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
             if (false == IsTokenValid(gitWrapper))
             {
-                throw new NullReferenceException($"Error with internal stored username and/or token, call the methode '{nameof(SetToken)}' first.");
+                throw new NullReferenceException($"Error with internal stored username and/or token, call the method '{nameof(SetToken)}' first.");
             }
 
             // Disable inherited credential helpers.
@@ -368,9 +424,9 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// <summary>
         ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
         /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
-        /// <br/>   behaviour accordingly.
+        /// <br/>   behavior accordingly.
         /// <br/>   
-        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.Token"/>:
+        /// <br/>   This authentication handler implements the behavior of <see cref="Credentials.Token"/>:
         /// <br/>   <inheritdoc cref="Credentials.Token"/>
         /// </summary>
         /// <param name="sender">sender is of type <see cref="IGitWrapper"/> and is never null</param>
@@ -383,7 +439,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
             if (false == IsTokenValid(gitWrapper))
             {
-                throw new NullReferenceException($"Error with internal stored username and/or token environment variable name, call the methode '{nameof(SetTokenFromEnvironment)}' first.");
+                throw new NullReferenceException($"Error with internal stored username and/or token environment variable name, call the method '{nameof(SetTokenFromEnvironment)}' first.");
             }
 
             // Disable inherited credential helpers.
@@ -404,9 +460,9 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// <summary>
         ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
         /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
-        /// <br/>   behaviour accordingly.
+        /// <br/>   behavior accordingly.
         /// <br/>   
-        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.UserAction"/>:
+        /// <br/>   This authentication handler implements the behavior of <see cref="Credentials.UserAction"/>:
         /// <br/>   <inheritdoc cref="Credentials.UserAction"/>
         /// </summary>
         /// <param name="sender">sender is of type <see cref="IGitWrapper"/> and is never null</param>
@@ -419,9 +475,9 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// <summary>
         ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
         /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
-        /// <br/>   behaviour accordingly.
+        /// <br/>   behavior accordingly.
         /// <br/>   
-        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.SshNoPassphrase"/>:
+        /// <br/>   This authentication handler implements the behavior of <see cref="Credentials.SshNoPassphrase"/>:
         /// <br/>   <inheritdoc cref="Credentials.SshNoPassphrase"/>
         /// </summary>
         /// <param name="sender">sender is of type <see cref="IGitWrapper"/> and is never null</param>
@@ -432,7 +488,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
             if (false == IsSshValid())
             {
-                throw new NullReferenceException($"Error with internal stored ssh file call the methode '{nameof(SetSsh)}' first.");
+                throw new NullReferenceException($"Error with internal stored ssh file call the method '{nameof(SetSsh)}' first.");
             }
 
             var psi = e.Process.StartInfo;
@@ -473,9 +529,9 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// <summary>
         ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
         /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
-        /// <br/>   behaviour accordingly.
+        /// <br/>   behavior accordingly.
         /// <br/>   
-        /// <br/>   This authentication handler implements the behaviour of <see cref="Credentials.Ssh"/>:
+        /// <br/>   This authentication handler implements the behavior of <see cref="Credentials.Ssh"/>:
         /// <br/>   <inheritdoc cref="Credentials.Ssh"/>
         /// </summary>
         /// <param name="sender">sender is of type <see cref="IGitWrapper"/> and is never null</param>
@@ -486,7 +542,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
             if (false == IsSshValid())
             {
-                throw new NullReferenceException($"Error with internal stored ssh file call the methode '{nameof(SetSsh)}' first.");
+                throw new NullReferenceException($"Error with internal stored ssh file call the method '{nameof(SetSsh)}' first.");
             }
 
             var envVar = new ProcessEnvironmentVariable(e.Process.StartInfo);

@@ -81,7 +81,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             if (null == configData)
             {
-                _configErrorMessage = $"The configuration file could not be deserialised; please check the configuration file '{_configFile}'";
+                _configErrorMessage = $"The configuration file could not be deserialized; please check the configuration file '{_configFile}'";
             }
 
             _configData = configData;
@@ -557,6 +557,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_12_SshWrongUrl()
         {
+            EnsureConfigData();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -577,6 +578,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_13_SshRightUrl()
         {
+            EnsureConfigData();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -589,6 +591,12 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
 
             git.Authentication.SetSsh(_configData.SshFile, string.Empty);
+
+#warning find a better position for that
+            // var fileOk = git.Authentication.IsSshSecure();
+            // git.Authentication.SecureSshFile();
+            // fileOk = git.Authentication.IsSshSecure();
+
             dto = git.Mirror(_configData.PrivateRepoSsh);
             Assert.AreEqual(0, dto.ExitCode);
             Assert.IsTrue(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -597,6 +605,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_14_SshPassword()
         {
+            EnsureConfigData();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -604,9 +613,15 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Credential = Credentials.Ssh;
 
             git.Authentication.SetSsh(_configData.SshFilePwProtected, _configData.SshFilePassword);
+
+#warning find a better position for that
+            // var fileOk = git.Authentication.IsSshSecure();
+            // git.Authentication.SecureSshFile();
+            // fileOk = git.Authentication.IsSshSecure();
+            
             var dto = git.Mirror(_configData.PrivateRepoSsh);
 
-            //File.WriteAllText("log.txt", dto.StandardError);
+            File.WriteAllText("log.txt", dto.StandardError);
 
             Assert.AreEqual(0, dto.ExitCode);
             Assert.IsTrue(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -615,6 +630,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_15_SshNoPassword()
         {
+            EnsureConfigData();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -631,6 +647,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_16_SshWrongPassword()
         {
+            EnsureConfigData();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -647,6 +664,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public void Test_17_SshSystem()
         {
+            EnsureConfigData();
             var git = new GitWrapperSystem();
             git.Credential = Credentials.Ssh;
             git.Authentication.SetSsh(_configData!.SshFilePwProtected, _configData.SshFilePassword);
@@ -659,6 +677,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         [TestMethod]
         public async Task Test_Example6()
         {
+            EnsureConfigData();
             var dir1 = "./d1";
             var dir2 = "./d2";
             RemoveDirectory(dir1);
