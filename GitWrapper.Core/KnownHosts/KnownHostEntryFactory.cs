@@ -3,10 +3,19 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts
 {
-
-    // https://man.openbsd.org/sshd.8?utm_source=chatgpt.com#SSH_KNOWN_HOSTS_FILE_FORMAT
+    /// <summary>
+    /// Creates known_hosts entries from lines and applies revoked key markers.
+    /// </summary>
+    /// <remarks>
+    /// Information about the format see: <see href="https://man.openbsd.org/sshd.8?utm_source=chatgpt.com#SSH_KNOWN_HOSTS_FILE_FORMAT"/>
+    /// </remarks>
     public static class KnownHostEntryFactory
     {
+        /// <summary>
+        /// Creates known_hosts entries from the specified lines.
+        /// </summary>
+        /// <param name="lines">The lines to parse.</param>
+        /// <returns>The parsed known_hosts entries.</returns>
         public static List<IKnownHostEntry> Create(string[] lines)
         {
             ArgumentNullException.ThrowIfNull(lines);
@@ -23,7 +32,10 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts
             return result;
         }
 
-        // Ensures that all revoked public keys also affect all other matching public keys.
+        /// <summary>
+        /// Applies revoked markers to all entries with matching public key fingerprints.
+        /// </summary>
+        /// <param name="knownHostEntries">The entries to update.</param>
         public static void ApplyRevokedMarkers(List<IKnownHostEntry> knownHostEntries)
         {
             ArgumentNullException.ThrowIfNull(knownHostEntries);
@@ -58,6 +70,13 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts
             }
         }
 
+        /// <summary>
+        /// Creates a known_hosts entry from the specified line.
+        /// </summary>
+        /// <param name="line">The line to parse.</param>
+        /// <returns>
+        /// The corresponding entry type: <see cref="IKnownHostEntry"/>
+        /// </returns>
         public static IKnownHostEntry Create(string line)
         {
             if (string.IsNullOrWhiteSpace(line))
@@ -75,6 +94,19 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts
                 : new KnownHostEntryUnknown() { Content = line };
         }
 
+        /// <summary>
+        /// Creates a known_hosts entry from the specified line.
+        /// </summary>
+        /// <remarks>
+        /// The output parameter is only valid if parsing succeeds.
+        /// </remarks>
+        /// <param name="line">The line to parse.</param>
+        /// <param name="knownHost">The parsed known host <see cref="IKnownHost"/>, or <see langword="null"/> if parsing fails.</param>
+        /// <param name="exception">The exception encountered during parsing, or <see langword="null"/> if no exception occurred.</param>
+        /// <returns>
+        ///         <see langword="true"/>  if parsing succeeds and the output parameter is valid;
+        /// <br/>   <see langword="false"/> otherwise.
+        /// </returns>
         private static bool TryCreateKnownHost(string line, [NotNullWhen(true)] out IKnownHost? knownHost, out Exception? exception)
         {
             knownHost = null;

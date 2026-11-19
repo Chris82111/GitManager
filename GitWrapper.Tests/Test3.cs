@@ -1,6 +1,7 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core;
 using Chris82111.GitManager.GitWrapper.Core.Authenticators;
 using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
+using Chris82111.GitManager.GitWrapper.Core.KnownHosts;
 using Chris82111.GitManager.GitWrapper.Core.Processes;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -94,6 +95,15 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             {
                 Assert.Inconclusive(_configErrorMessage ?? "The configuration DTO must not be null.");
             }
+
+            var auth = new GitAuthenticationBase();
+            auth.SetSsh(_configData!.SshFilePwProtected, _configData.SshFilePassword);
+
+            if (false == auth.IsSshSecure())
+            {
+                auth.SecureSshFile();
+            }
+            Assert.IsTrue(auth.IsSshSecure());
         }
 
         private static IGitWrapper EnsureGitWrapper()
@@ -586,16 +596,12 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Credential = Credentials.Ssh;
 
             git.Authentication.SetSsh(_configData.SshFileInvalid, string.Empty);
+
             var dto = git.Mirror(_configData.PrivateRepoSsh);
             Assert.AreEqual(128, dto.ExitCode);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
 
             git.Authentication.SetSsh(_configData.SshFile, string.Empty);
-
-#warning find a better position for that
-            // var fileOk = git.Authentication.IsSshSecure();
-            // git.Authentication.SecureSshFile();
-            // fileOk = git.Authentication.IsSshSecure();
 
             dto = git.Mirror(_configData.PrivateRepoSsh);
             Assert.AreEqual(0, dto.ExitCode);
@@ -613,12 +619,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Credential = Credentials.Ssh;
 
             git.Authentication.SetSsh(_configData.SshFilePwProtected, _configData.SshFilePassword);
-
-#warning find a better position for that
-            // var fileOk = git.Authentication.IsSshSecure();
-            // git.Authentication.SecureSshFile();
-            // fileOk = git.Authentication.IsSshSecure();
-            
+                        
             var dto = git.Mirror(_configData.PrivateRepoSsh);
 
             File.WriteAllText("log.txt", dto.StandardError);
@@ -720,6 +721,52 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             RemoveDirectory(dir1);
             RemoveDirectory(dir2);
+        }
+
+        [TestMethod]
+        public async Task Test_Example7()
+        {
+            EnsureConfigData();
+            var dir = "./d";
+            RemoveDirectory(dir);
+            Assert.IsFalse(Directory.Exists(dir));
+            RemoveDirectory(".bin");
+            System.IO.File.Delete("known_hosts");
+
+
+
+            var git = GitWrapperFactory.Create();
+
+            await git.ExtractArchiveAsync();
+
+            var auth = new GitAuthenticationBase();
+            auth.SetSsh(_configData!.SshFilePwProtected, _configData.SshFilePassword);
+            if (!auth.IsSshSecure())
+            {
+                auth.SecureSshFile();
+            }
+
+            var keyType = auth.SshKeyTypes().First();
+
+            var knownHostFile = await KnownHostMultiton.InstanceAsync("known_hosts");
+            await knownHostFile.VerifyAndAddHostAsync("github.com", keyType, "+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU");
+            await knownHostFile.WriteAsync();
+
+            auth.KnownHostsFiles.Add(knownHostFile);
+            auth.KnownHostsFileSelection = KnownHostsFileSelection.ListedFiles;
+            
+            git.Authentication = auth;
+
+            git.Credential = Credentials.Ssh;
+
+            var dto1 = await git.MirrorAsync(_configData.PrivateRepoSsh, dir);
+
+
+
+            Assert.AreEqual(0, dto1.ExitCode);
+            Assert.IsTrue(Directory.Exists(Path.Combine(dir, MirrorDirectory(_configData.PrivateRepoSsh).Name)));
+
+            RemoveDirectory(dir);
         }
     }
 }

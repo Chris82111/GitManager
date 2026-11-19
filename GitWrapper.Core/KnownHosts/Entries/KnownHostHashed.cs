@@ -3,9 +3,19 @@ using System.Text;
 
 namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
 {
+    /// <summary>
+    /// Represents an encrypted entry in a known_hosts file.
+    /// </summary>
     public sealed class KnownHostHashed : KnownHostBase
     {
         private string _salt = null!;
+
+        /// <summary>
+        /// The Base64-encoded salt used to hash the hostname.
+        /// </summary>
+        /// <value>
+        /// The Base64-encoded salt.
+        /// </value>
         public required string Salt
         {
             get => _salt;
@@ -17,6 +27,13 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
         }
 
         private string _hash = null!;
+
+        /// <summary>
+        /// The Base64-encoded SHA-1 hash of the hostname.
+        /// </summary>
+        /// <value>
+        /// The Base64-encoded hostname hash.
+        /// </value>
         public required string Hash
         {
             get => _hash;
@@ -27,6 +44,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
             }
         }
 
+        /// <inheritdoc />
         public override string Hostname
         {
             get => $"|1|{Salt}|{Hash}";
@@ -36,6 +54,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
         private byte[] _saltByte = null!;
         private byte[] _hashByte = null!;
 
+        /// <inheritdoc />
         public override bool MatchesHost(string host, int port, string? keyType = null)
         {
             byte[] hostBytes;

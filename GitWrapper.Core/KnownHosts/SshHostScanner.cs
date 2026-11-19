@@ -2,12 +2,28 @@
 using Renci.SshNet;
 using Renci.SshNet.Common;
 
-
 namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts
 {
-    // install: dotnet add package SSH.NET
+    /// <summary>
+    /// Provides functionality for scanning SSH hosts and retrieving their public host keys.
+    /// </summary>
+    /// <remarks>
+    ///         Requires the SSH.NET NuGet package.
+    /// <br/>   Install using: <c>dotnet add package SSH.NET</c>
+    /// </remarks>
     public class SshHostScanner
     {
+        /// <summary>
+        /// Scans an SSH host and retrieves its public host key without authenticating.
+        /// </summary>
+        /// <param name="host">The hostname to scan.</param>
+        /// <param name="port">The SSH port. Defaults to 22.</param>
+        /// <param name="algorithm">The optional host-key algorithm to use.</param>
+        /// <param name="timeSpan">The optional connection timeout. Defaults to 30 seconds.</param>
+        /// <param name="cancellationToken">A token to cancel the operation.</param>
+        /// <returns>The retrieved host key.</returns>
+        /// <exception cref="NotSupportedException">The specified host-key algorithm is not supported.</exception>
+        /// <exception cref="InvalidOperationException">The host key could not be obtained.</exception>
         public static async Task<KnownHostSingle> ScanAsync(
             string host,
             int port = 22,

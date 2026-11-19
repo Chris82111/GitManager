@@ -1,9 +1,18 @@
 ﻿namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
 {
-    // github.com,github.org,*.github.com,git??b.com,!git?ab.com,[github.com]:22
+    /// <summary>
+    /// Represents multiple entries from a known_hosts file.
+    /// </summary>
+    /// <remarks>
+    /// A entry can contains: <c>github.com,github.org,*.github.com,git??b.com,!git?ab.com,[github.com]:22</c>
+    /// </remarks>
     public sealed class KnownHostMultiple : KnownHostBase
     {
         private List<string> _hostnames = null!;
+
+        /// <summary>
+        /// Contains the individual hosts as a list
+        /// </summary>
         public required List<string> Hostnames
         {
             get => _hostnames;
@@ -20,6 +29,7 @@
             }
         }
 
+        /// <inheritdoc />
         public override string Hostname
         {
             get => string.Join(',', Hostnames);
@@ -30,6 +40,7 @@
 
         private List<CachedHost> _excludeHostnames = new List<CachedHost>();
 
+        /// <inheritdoc />
         public override bool MatchesHost(string host, int port, string? keyType = null)
         {
             if (null != keyType && keyType != KeyType)

@@ -3,17 +3,24 @@ using System.Text;
 
 namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
 {
+    /// <summary>
+    ///         Provides a base implementation of <see cref="IKnownHost"/>, with virtual and
+    /// <br/>   abstract members for representing and matching known SSH hosts.
+    /// </summary>
     public abstract class KnownHostBase : KnownHostEntryBase, IKnownHost
     {
+        /// <inheritdoc />
         public KnownHostMarkers Marker { get; set; } = KnownHostMarkers.None;
 
+        /// <inheritdoc />
         public abstract string Hostname { get; init; }
 
+        /// <inheritdoc />
         public required string KeyType { get; init; }
 
         private string _publicKey = string.Empty;
 
-        // publicKeyBase64
+        /// <inheritdoc />
         public required string PublicKey
         {
             get => _publicKey;
@@ -24,18 +31,22 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
             }
         }
 
+        /// <inheritdoc />
         public string? Comment { get; init; }
 
-        // Fingerprint is string.Empty if no hash can be calculated from PublicKey
+        /// <inheritdoc />
         public string FingerprintSha256 { get; private set; } = string.Empty;
-        
+
+        /// <inheritdoc />
         public virtual bool MatchesHost(string host, string? keyType = null)
         {
             return MatchesHost(host, 22, keyType);
         }
 
+        /// <inheritdoc />
         public abstract bool MatchesHost(string host, int port, string? keyType = null);
 
+        /// <inheritdoc />
         public override string Serialize()
         {
             var str = new StringBuilder();
@@ -61,6 +72,14 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
             return str.ToString();
         }
 
+        /// <summary>
+        /// Calculates the SHA-256 fingerprint of the specified Base64-encoded public key.
+        /// </summary>
+        /// <param name="publicKey">The Base64-encoded public key.</param>
+        /// <returns>
+        ///         The SHA-256 fingerprint in Base64 format without trailing padding characters,
+        /// <br/>   or <see langword="string.Empty"/> if the fingerprint could not be calculated.
+        /// </returns>
         public static string CalculateFingerprintSha256(string publicKey)
         {
             if (string.IsNullOrWhiteSpace(publicKey))

@@ -1,6 +1,9 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
+using Chris82111.GitManager.GitWrapper.Core.KnownHosts;
 using Chris82111.GitManager.GitWrapper.Core.Processes;
+using Renci.SshNet;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 {
@@ -20,6 +23,12 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
         /// <inheritdoc />
         public Action<object?, ProcessEventArgs>? UserAction { get; set; } = null;
+
+        /// <inheritdoc />
+        public KnownHostsFileSelection KnownHostsFileSelection { get; set; } = KnownHostsFileSelection.SystemStandard;
+
+        /// <inheritdoc />
+        public List<KnownHostsFile> KnownHostsFiles { get; set; } = new List<KnownHostsFile>();
 
         /// <summary>
         /// Contains references to the objects that use this authenticator
@@ -189,6 +198,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// </summary>
         protected string? _password = null;
 
+        /// <inheritdoc />
         public bool IsSshSecure()
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
@@ -213,6 +223,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
             return (mode & forbidden) == 0;
         }
 
+        /// <inheritdoc />
         public void SecureSshFile()
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
@@ -229,21 +240,17 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
                 UnixFileMode.UserRead | UnixFileMode.UserWrite);
         }
 
-        public static void Ssh()
+        /// <inheritdoc />
+        public List<string> SshKeyTypes()
         {
-            // List:
-            // ssh-keygen -F github.com -f ~/.ssh/known_hosts
+            ObjectDisposedException.ThrowIf(_disposed, this);
 
-            // Remove:
-            // ssh-keygen -R github.com -f ~/.ssh/known_hosts
+            ArgumentNullException.ThrowIfNull(_filePath);
 
-            // Test your file type:
-            // ssh-keygen -lf ./key
-
-            // Get servers key:
-            // ssh-keyscan -t ed25519 github.com
+            using var privateKey = new PrivateKeyFile(_filePath, _password);
+            
+            return privateKey.HostKeyAlgorithms.Select(algorithm => algorithm.Name).ToList();
         }
-
 
         /// <inheritdoc />
         public bool IsSshValid()
@@ -473,6 +480,39 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         }
 
         /// <summary>
+        ///         Enters a read lock on all configured known hosts files and registers <see cref="ExitReadLock"/>
+        /// <br/>   to be called when the associated Git process ends.
+        /// </summary>
+        /// <param name="sender">
+        /// The <see cref="IGitWrapper"/> instance associated with the operation.
+        /// </param>
+        protected virtual void EnterReadLock(object? sender)
+        {
+            KnownHostsFiles?.ForEach(file => file.EnterReadLock());
+            if (null != sender)
+            {
+                ((IGitWrapper)sender).AfterProcessEnd += ExitReadLock;
+            }
+        }
+
+        /// <summary>
+        ///         Exits the read lock on all configured known hosts files and unregisters
+        /// <br/>   itself from the associated Git process-end event.
+        /// </summary>
+        /// <param name="sender">
+        /// The <see cref="IGitWrapper"/> instance whose process has ended.
+        /// </param>
+        /// <param name="e">The event arguments.</param>
+        protected virtual void ExitReadLock(object? sender, EventArgs e)
+        {
+            KnownHostsFiles?.ForEach(file => file.ExitReadLock());
+            if (null != sender)
+            {
+                ((IGitWrapper)sender).AfterProcessEnd -= ExitReadLock;
+            }
+        }
+
+        /// <summary>
         ///         This is an authentication handler that is called via the <see cref="IGitWrapper.BeforeProcessStart"/>
         /// <br/>   event before the process starts. It modifies and sets environment variables to influence Git’s
         /// <br/>   behavior accordingly.
@@ -496,7 +536,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
             // The debug options "-vvv" can be added after the SSH command
 
             // --- Configure GIT_SSH_COMMAND for non-interactive Git operations ---
-            envVar.Set("GIT_SSH_COMMAND", 
+            var gitSshCommand = 
                 $"ssh -i \"{_filePath}\" " + // Use this specific private key file for authentication
                 $"-F \"{_nullDevice}\" " +   // SSH will not read ~/.ssh/config (or the system SSH config)
                 "-o BatchMode=yes " +        // yes : Disable interactive prompts (fail instead of asking for password)
@@ -505,7 +545,39 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
                 "-o PreferredAuthentications=publickey " + // Only attempt public key authentication, skip password or other methods
                 "-o IdentityAgent=none " +                 // This disables the SSH authentication agent for this connection.
                 "-o PasswordAuthentication=no " +          // This prevents SSH from using the traditional SSH password authentication method.
-                "-o KbdInteractiveAuthentication=no");     // This disables keyboard-interactive authentication.
+                "-o KbdInteractiveAuthentication=no";     // This disables keyboard-interactive authentication.
+
+            switch (KnownHostsFileSelection)
+            {
+                case KnownHostsFileSelection.None:
+                    gitSshCommand += $" -o UserKnownHostsFile=\"{_nullDevice}\" -o GlobalKnownHostsFile=\"{_nullDevice}\"";
+                    break;
+
+                case KnownHostsFileSelection.ListedFiles:
+                    if (null == KnownHostsFiles || 0 == KnownHostsFiles.Count)
+                    {
+                        throw new ArgumentException(
+                            $"The property {nameof(KnownHostsFiles)} is not correctly configured. " +
+                            $"At least one known hosts file must be specified when using {KnownHostsFileSelection.ListedFiles}. " +
+                            $"If no specific files are required, use {KnownHostsFileSelection.None} or {KnownHostsFileSelection.SystemStandard} instead.");
+                    }
+                    EnterReadLock(sender);
+
+                    var knownHostsFiles = KnownHostsFiles.Select(file => file.FilePath).ToArray();
+                    gitSshCommand += $" {CreateUserKnownHostsFileOption(knownHostsFiles)} -o GlobalKnownHostsFile=\"{_nullDevice}\"";
+                    break;
+
+                case KnownHostsFileSelection.SystemStandard:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        null,
+                        KnownHostsFileSelection,
+                        $"The property {nameof(KnownHostsFileSelection)} contains an unsupported value.");
+            }
+            envVar.Set("GIT_SSH_COMMAND", gitSshCommand);
+
 
             // --- Credential management / Git Credential Manager ---
             envVar.Set("GCM_INTERACTIVE", "Never");                // Never prompt interactively for credentials (Git Credential Manager)
@@ -550,16 +622,48 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
             // The debug options "-vvv" can be added after the SSH command
 
             // --- Configure GIT_SSH_COMMAND for non-interactive Git operations ---
-            envVar.Set("GIT_SSH_COMMAND",
+            var gitSshCommand =
                 $"ssh -i \"{_filePath}\" " + // Use this specific private key file for authentication
-                $"-F \"{_nullDevice}\" " +        // SSH will not read ~/.ssh/config (or the system SSH config)
-                "-o BatchMode=no " +              // yes : Disable interactive prompts (fail instead of asking for password)
-                "-o IdentitiesOnly=yes " +        // Use only the identity files specified with -i, ignore SSH agent keys
+                $"-F \"{_nullDevice}\" " +   // SSH will not read ~/.ssh/config (or the system SSH config)
+                "-o BatchMode=no " +         // yes : Disable interactive prompts (fail instead of asking for password)
+                "-o IdentitiesOnly=yes " +   // Use only the identity files specified with -i, ignore SSH agent keys
                 "-o StrictHostKeyChecking=yes " +          // no : Automatically accept host keys (useful in scripts/CI, but bypasses security check)
                 "-o PreferredAuthentications=publickey " + // Only attempt public key authentication, skip password or other methods
                 "-o IdentityAgent=none " +                 // This disables the SSH authentication agent for this connection.
                 "-o PasswordAuthentication=no " +          // This prevents SSH from using the traditional SSH password authentication method.
-                "-o KbdInteractiveAuthentication=no");     // This disables keyboard-interactive authentication.
+                "-o KbdInteractiveAuthentication=no";      // This disables keyboard-interactive authentication.
+
+            switch (KnownHostsFileSelection)
+            {
+                case KnownHostsFileSelection.None:
+                    gitSshCommand += $" -o UserKnownHostsFile=\"{_nullDevice}\" -o GlobalKnownHostsFile=\"{_nullDevice}\"";
+                    break;
+
+                case KnownHostsFileSelection.ListedFiles:
+                    if (null == KnownHostsFiles || 0 == KnownHostsFiles.Count)
+                    {
+                        throw new ArgumentException(
+                            $"The property {nameof(KnownHostsFiles)} is not correctly configured. " +
+                            $"At least one known hosts file must be specified when using {KnownHostsFileSelection.ListedFiles}. " +
+                            $"If no specific files are required, use {KnownHostsFileSelection.None} or {KnownHostsFileSelection.SystemStandard} instead.");
+                    }
+                    EnterReadLock(sender);
+
+                    var knownHostsFiles = KnownHostsFiles.Select(file => file.FilePath).ToArray();
+                    gitSshCommand += $" {CreateUserKnownHostsFileOption(knownHostsFiles)} -o GlobalKnownHostsFile=\"{_nullDevice}\"";
+                    break;
+
+                case KnownHostsFileSelection.SystemStandard:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        null,
+                        KnownHostsFileSelection,
+                        $"The property {nameof(KnownHostsFileSelection)} contains an unsupported value.");
+            }
+            envVar.Set("GIT_SSH_COMMAND", gitSshCommand);
+
 
             // --- Credential management / Git Credential Manager ---
             envVar.Set("GCM_INTERACTIVE", "Never");                // Never prompt interactively for credentials (Git Credential Manager)
@@ -596,6 +700,54 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
             if (null == value) { return null; }
 
             return "'" + value.Replace("'", "'\\''") + "'";
+        }
+
+        /// <summary>
+        /// Creates an SSH command-line option specifying the user known hosts files.
+        /// </summary>
+        /// <param name="filesWithFullPath">
+        ///         An array of full paths to the known hosts files. If the array is <see langword="null"/> or empty,
+        /// <br/>   the <see cref="_nullDevice"/>> device is used to disable reading user known hosts files.
+        /// <br/>   If multiple paths are provided, they are individually quoted.
+        /// </param>
+        /// <returns>
+        /// A command-line option for <c>UserKnownHostsFile</c> with the specified paths.
+        /// </returns>
+        protected static string CreateUserKnownHostsFileOption(string[] filesWithFullPath)
+        {
+            if (null == filesWithFullPath || 0 == filesWithFullPath.Length)
+            {
+                return $"-o UserKnownHostsFile=\"{_nullDevice}\"";
+            }
+
+            if (1 == filesWithFullPath.Length)
+            {
+                var onePath = filesWithFullPath[0].Replace('\\', '/');
+                return $"-o UserKnownHostsFile=\"{onePath}\"";
+            }
+
+            var builder = new StringBuilder();
+
+            builder.Append("-o UserKnownHostsFile=\"");
+
+            for (int i = 0; i < filesWithFullPath.Length; i++)
+            {
+                string path = filesWithFullPath[i].Replace('\\', '/');
+
+                builder.Append("\\\"");
+                builder.Append(path);
+                builder.Append("\\\"");
+                
+
+                if (i < filesWithFullPath.Length - 1)
+                {
+                    builder.Append(' ');
+                }
+            }
+
+            builder.Append('"');
+
+            return builder.ToString();
         }
 
         #endregion
