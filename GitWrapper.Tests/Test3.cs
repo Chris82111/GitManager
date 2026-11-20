@@ -98,12 +98,29 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             var auth = new GitAuthenticationBase();
             auth.SetSsh(_configData!.SshFilePwProtected, _configData.SshFilePassword);
+            var keyType = auth.SshKeyTypes().First();
 
             if (false == auth.IsSshSecure())
             {
                 auth.SecureSshFile();
             }
             Assert.IsTrue(auth.IsSshSecure());
+        }
+
+        private void EnsureSystemKnownHostsFile()
+        {
+            EnsureConfigData();
+
+            var auth = new GitAuthenticationBase();
+            auth.SetSsh(_configData.SshFilePwProtected, _configData.SshFilePassword);
+            var keyType = auth.SshKeyTypes().First();
+
+            var knownHostsFile = new KnownHostsFile(KnownHostsFile.GetUserKnownHostsPath());
+            var available = knownHostsFile.FindHosts("github.com", keyType).Any();
+            if (false == available)
+            {
+                Assert.Inconclusive($"The system-standard known_hosts file '{KnownHostsFile.GetUserKnownHostsPath()}' does not contain a GitHub '{keyType}' key.");
+            }
         }
 
         private static IGitWrapper EnsureGitWrapper()
@@ -589,6 +606,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         public void Test_13_SshRightUrl()
         {
             EnsureConfigData();
+            EnsureSystemKnownHostsFile();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -612,6 +630,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         public void Test_14_SshPassword()
         {
             EnsureConfigData();
+            EnsureSystemKnownHostsFile();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -679,6 +698,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         public async Task Test_Example6()
         {
             EnsureConfigData();
+            EnsureSystemKnownHostsFile();
             var dir1 = "./d1";
             var dir2 = "./d2";
             RemoveDirectory(dir1);

@@ -1,6 +1,7 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries;
 using Chris82111.GitManager.GitWrapper.Core.KnownHosts.Locking;
 using System.Collections.Concurrent;
+using System.Runtime.Versioning;
 using System.Text;
 
 namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts
@@ -677,6 +678,56 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts
             return _locks.GetOrAdd(
                 fullPath,
                 static _ => new AtomicReaderWriterLock());
+        }
+
+        /// <summary>
+        /// Gets the path to the current user's default SSH <c>known_hosts</c> file.
+        /// </summary>
+        /// <remarks>
+        /// The methode return the default paths, not necessarily the paths configured in the user's SSH configuration
+        /// </remarks>
+        /// <returns>
+        ///         The path to <c>~/.ssh/known_hosts</c> on Linux or
+        /// <br/>   <c>%USERPROFILE%\.ssh\known_hosts</c> on Windows.
+        /// </returns>
+        public static string GetUserKnownHostsPath()
+        {
+            string userProfile = Environment.GetFolderPath(
+                Environment.SpecialFolder.UserProfile);
+
+            return Path.Combine(userProfile, ".ssh", "known_hosts");
+        }
+
+        /// <summary>
+        /// Gets the path to the system-wide SSH <c>known_hosts</c> file.
+        /// </summary>
+        /// <remarks>
+        /// The methode return the default paths, not necessarily the paths configured in the user's SSH configuration
+        /// </remarks>
+        /// <returns>
+        ///         The path to <c>/etc/ssh/ssh_known_hosts</c> on Linux or
+        /// <br/>   <c>%ProgramData%\ssh\ssh_known_hosts</c> on Windows.
+        /// </returns>
+        /// <exception cref="PlatformNotSupportedException">The current operating system is not supported.</exception>
+        /// 
+        [SupportedOSPlatform("linux")]
+        [SupportedOSPlatform("windows")]
+        public static string GetSystemKnownHostsPath()
+        {
+            if (OperatingSystem.IsLinux())
+            {
+                return "/etc/ssh/ssh_known_hosts";
+            }
+
+            if (OperatingSystem.IsWindows())
+            {
+                string programData = Environment.GetFolderPath(
+                    Environment.SpecialFolder.CommonApplicationData);
+
+                return Path.Combine(programData, "ssh", "ssh_known_hosts");
+            }
+
+            throw new PlatformNotSupportedException("The current operating system is not supported.");
         }
     }
 }
