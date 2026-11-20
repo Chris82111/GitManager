@@ -43,6 +43,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts
             var knownHosts = new List<IKnownHost>();
 
             var revokedFingerprints = new HashSet<string>();
+            var revokedPublicKey = new HashSet<string>();
 
             foreach (var knownHostEntry in knownHostEntries)
             {
@@ -51,21 +52,38 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts
                     knownHosts.Add(knownHost);
                     if (KnownHostMarkers.Revoked == knownHost.Marker)
                     {
-                        revokedFingerprints.Add(knownHost.FingerprintSha256);
+                        if (string.Empty == knownHost.FingerprintSha256)
+                        {
+                            revokedPublicKey.Add(knownHost.PublicKey);
+                        }
+                        else
+                        {
+                            revokedFingerprints.Add(knownHost.FingerprintSha256);
+                        }
                     }
                 }
             }
 
-            if (0 == revokedFingerprints.Count)
+            if (0 == revokedFingerprints.Count && 0 == revokedPublicKey.Count)
             {
                 return;
             }
 
             foreach (var knownHost in knownHosts)
             {
-                if (revokedFingerprints.Contains(knownHost.FingerprintSha256))
+                if (string.Empty == knownHost.FingerprintSha256)
                 {
-                    knownHost.Marker = KnownHostMarkers.Revoked;
+                    if (revokedPublicKey.Contains(knownHost.PublicKey))
+                    {
+                        knownHost.Marker = KnownHostMarkers.Revoked;
+                    }
+                }
+                else
+                {
+                    if (revokedFingerprints.Contains(knownHost.FingerprintSha256))
+                    {
+                        knownHost.Marker = KnownHostMarkers.Revoked;
+                    }
                 }
             }
         }

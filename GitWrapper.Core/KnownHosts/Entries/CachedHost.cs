@@ -6,7 +6,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
     /// <summary>
     /// Stores parsed hostname matching information for reuse.
     /// </summary>
-    internal class CachedHost
+    public class CachedHost
     {
         /// <summary>
         /// Gets or sets the port associated with the hostname.
@@ -38,7 +38,6 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
         /// <br/>   by parsing the specified hostname.
         /// </summary>
         /// <param name="hostname">The hostname pattern to parse.</param>
-        /// <exception cref="ArgumentNullException">The hostname is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The hostname contains an invalid port format.</exception>
         /// <exception cref="ArgumentOutOfRangeException">The specified port is outside the permitted range.</exception>
         public CachedHost(string hostname)
@@ -46,6 +45,11 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
             HasWildcard = false;
             HostnameRegex = null;
             IsExclusion = false;
+
+            if (null == hostname)
+            {
+                hostname = string.Empty;
+            }
 
             if (hostname.StartsWith('!'))
             {
@@ -63,7 +67,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
 
                 if (false == int.TryParse(
                         hostname[(endIndex + 2)..],
-                        NumberStyles.None,
+                        NumberStyles.AllowLeadingSign,
                         CultureInfo.InvariantCulture,
                         out int port))
                 {
@@ -80,6 +84,10 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
             }
             else
             {
+                if (hostname.ContainsAny(']', ':'))
+                {
+                    throw new ArgumentException("Invalid square bracket syntax.", nameof(hostname));
+                }
                 Port = 22;
                 MatchHostname = hostname;
             }
@@ -112,7 +120,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.KnownHosts.Entries
         /// <exception cref="ArgumentNullException">The hostname is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The hostname is empty or contains only whitespace.</exception>
         /// <exception cref="ArgumentOutOfRangeException">The port is outside the permitted range.</exception>
-        public bool MatchesHost(string host, int port)
+        public bool MatchesHost(string host, int port = 22)
         {
             ArgumentNullException.ThrowIfNullOrWhiteSpace(host);
             ArgumentOutOfRangeException.ThrowIfLessThan(port, 0);
