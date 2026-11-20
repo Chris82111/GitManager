@@ -40,3 +40,7 @@ stateDiagram-v2
 ## License Portable Windows
 
 - Download: GPL-2.0-only ([Git for Windows](https://github.com/git-for-windows/git?tab=License-1-ov-file#readme)), [SPDX](https://spdx.org/licenses/GPL-2.0-only.html)
+
+## License NuGet Packages
+
+- MIT ([SSH.NET](https://github.com/sshnet/SSH.NET?tab=MIT-1-ov-file)), [SPDX](https://spdx.org/licenses/MIT.html)

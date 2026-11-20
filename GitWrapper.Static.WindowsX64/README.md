@@ -14,34 +14,40 @@ This package is licensed under MIT.
 Please note the relevant third-party licenses:
 
 - Zlib:
-  This product includes software developed by the Zlib Project. (https://www.zlib.net/)
+  This product includes software developed by the Zlib project. (https://www.zlib.net/)
   License, Zlib: https://zlib.net/zlib_license.html
   SPDX: https://spdx.org/licenses/Zlib.html
   
 - OpenSSL:
-  This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/)
+  This product includes software developed by the OpenSSL project for use in the OpenSSL Toolkit (http://www.openssl.org/)
   License, Apache-2.0: https://github.com/openssl/openssl?tab=Apache-2.0-1-ov-file#readme
   SPDX: https://spdx.org/licenses/Apache-2.0.html
   
 - libpsl:
-  This product includes software developed by the libpsl Project. (https://github.com/rockdaboot/libpsl/tree/master)
+  This product includes software developed by the libpsl project. (https://github.com/rockdaboot/libpsl/tree/master)
   License, MIT: https://github.com/rockdaboot/libpsl/blob/master/LICENSE
   SPDX: https://spdx.org/licenses/MIT.html
   
 - libcurl:
-  This product includes software developed by the curl Project. (https://curl.se/)
+  This product includes software developed by the curl project. (https://curl.se/)
   License, curl: https://curl.se/docs/faq.html#License-Issues
   SPDX: https://spdx.org/licenses/curl.html
   
 - Git:
-  This product includes software developed by the Git Project. (https://git-scm.com/)
+  This product includes software developed by the Git project. (https://git-scm.com/)
   License, GPL-2.0-only: https://git-scm.com/about#free-and-open-source
   SPDX: https://spdx.org/licenses/GPL-2.0-only.html
 
+- SSH.NET:
+  This product includes software developed by the SSH.NET project. (https://github.com/sshnet/SSH.NET)
+  License, MIT: https://github.com/sshnet/SSH.NET?tab=MIT-1-ov-file
+  SPDX: https://spdx.org/licenses/MIT.html
+
 Acknowledgment
 
-- Zlib: This product includes software developed by the Zlib Project. (https://www.zlib.net/) 
-- OpenSSL: This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/)
-- libpsl: This product includes software developed by the libpsl Project. (https://github.com/rockdaboot/libpsl/tree/master)
-- libcurl: This product includes software developed by the curl Project. (https://curl.se/)
-- Git: This product includes software developed by the Git Project. (https://git-scm.com/)
+- Zlib: This product includes software developed by the Zlib project. (https://www.zlib.net/) 
+- OpenSSL: This product includes software developed by the OpenSSL project for use in the OpenSSL Toolkit (http://www.openssl.org/)
+- libpsl: This product includes software developed by the libpsl project. (https://github.com/rockdaboot/libpsl/tree/master)
+- libcurl: This product includes software developed by the curl project. (https://curl.se/)
+- Git: This product includes software developed by the Git project. (https://git-scm.com/)
+- SSH.NET: This product includes software developed by the SSH.NET project. (https://github.com/sshnet/SSH.NET)
