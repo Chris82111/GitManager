@@ -72,4 +72,4 @@ This repository provides a wrapper that builds on other essential projects. To a
 - libpsl: This product includes software developed by the libpsl project. (https://github.com/rockdaboot/libpsl/tree/master)
 - libcurl: This product includes software developed by the curl project. (https://curl.se/)
 - Git: This product includes software developed by the Git project. (https://git-scm.com/)
-- This product includes software developed by the SSH.NET project. (https://github.com/sshnet/SSH.NET)
+- SSH.NET: This product includes software developed by the SSH.NET project. (https://github.com/sshnet/SSH.NET)

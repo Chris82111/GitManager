@@ -210,6 +210,11 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 
             ArgumentNullException.ThrowIfNull(_filePath);
 
+            if (!File.Exists(_filePath))
+            {
+                return false;
+            }
+
             UnixFileMode mode = File.GetUnixFileMode(_filePath);
 
             UnixFileMode forbidden =

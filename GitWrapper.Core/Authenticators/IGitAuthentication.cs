@@ -109,7 +109,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// </summary>
         /// <returns>
         ///         true: If the file permissions are secure or the system does not require Unix permission checks.
-        /// <br/>   false: If the file permissions are not secure.
+        /// <br/>   false: If the file does not exist or its permissions are insecure.
         /// </returns>
         bool IsSshSecure();
 
