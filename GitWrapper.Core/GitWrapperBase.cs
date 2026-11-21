@@ -11,6 +11,11 @@ namespace Chris82111.GitManager.GitWrapper.Core
     /// </summary>
     public abstract class GitWrapperBase : IGitWrapper
     {
+        /// <summary>
+        /// Gets the name of the file used to detect whether the program directory has been moved.
+        /// </summary>
+        public static string MoveDetectionFileName { get; set; } = "extractedPath.txt";
+
         /// <inheritdoc/>
         public event EventHandler<ProcessEventArgs>? BeforeProcessStart;
 
@@ -622,7 +627,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         {
             ArgumentNullException.ThrowIfNull(RuntimeDirectory);
 
-            string file = Path.Combine(RuntimeDirectory, "extractedPath.txt");
+            string file = Path.Combine(RuntimeDirectory, MoveDetectionFileName);
 
             if (false == File.Exists(file))
             {

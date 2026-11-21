@@ -236,6 +236,6 @@ public async Task Test_Example7()
 
     git.Credential = Credentials.Ssh;
 
-    var dto1 = await git.MirrorAsync(_configData.PrivateRepoSsh, dir);
+    var dto1 = await git.MirrorAsync($"...", dir1);
 }
 ```
