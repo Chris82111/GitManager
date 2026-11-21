@@ -711,11 +711,16 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             EnsureConfigData();
             var dir1 = "./d1";
             var dir2 = "./d2";
+            var bin1 = "./bin1";
+            var bin2 = "./bin2";
             RemoveDirectory(dir1);
             RemoveDirectory(dir2);
+            RemoveDirectory(bin1);
+            RemoveDirectory(bin2);
             Assert.IsFalse(Directory.Exists(dir1));
             Assert.IsFalse(Directory.Exists(dir2));
-            RemoveDirectory(".bin");
+            Assert.IsFalse(Directory.Exists(bin1));
+            Assert.IsFalse(Directory.Exists(bin2));
 
 
 
@@ -723,8 +728,8 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             var git2 = GitWrapperFactory.Create();
             
             await Task.WhenAll(
-                git1.ExtractArchiveAsync(),
-                git2.ExtractArchiveAsync());
+                git1.ExtractArchiveAsync(bin1),
+                git2.ExtractArchiveAsync(bin2));
 
             var auth = new GitAuthenticationBase();
             auth.SetToken(_configData.Username, _configData.Token);
@@ -751,6 +756,8 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
             RemoveDirectory(dir1);
             RemoveDirectory(dir2);
+            RemoveDirectory(bin1);
+            RemoveDirectory(bin2);
         }
 
         [TestMethod]

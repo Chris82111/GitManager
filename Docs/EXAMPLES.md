@@ -163,12 +163,17 @@ The example demonstrates the following:
 ```c#
 public async Task Test_Example6()
 {
+    var dir1 = "./d1";
+    var dir2 = "./d2";
+    var bin1 = "./bin1";
+    var bin2 = "./bin2";
+    
     var git1 = GitWrapperFactory.Create();
     var git2 = GitWrapperFactory.Create();
 
     await Task.WhenAll(
-        git1.ExtractArchiveAsync(),
-        git2.ExtractArchiveAsync());
+        git1.ExtractArchiveAsync(bin1),
+        git2.ExtractArchiveAsync(bin1));
 
     var auth = new GitAuthenticationBase();
     auth.SetToken(null, "ghp_***");

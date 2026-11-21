@@ -1,6 +1,7 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core.Authenticators;
 using Chris82111.GitManager.GitWrapper.Core.Helpers;
 using Chris82111.GitManager.GitWrapper.Core.Processes;
+using Chris82111.GitManager.GitWrapper.Core.Utilities;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
@@ -52,7 +53,7 @@ namespace Chris82111.GitManager.GitWrapper.Core
         /// <summary>
         /// Synchronizes archive extraction across all instances.
         /// </summary>
-        protected static readonly SemaphoreSlim _extractLock = new(1, 1);
+        protected SemaphoreSlim? _extractLock = null;
 
         /// <inheritdoc/>
         public virtual bool IsSupported
@@ -411,12 +412,12 @@ namespace Chris82111.GitManager.GitWrapper.Core
         {
             EnsureSupported();
 
-            // InitializingPaths(
+            // InitializePaths(
             //    destination,
             //    ArchivePaths.ArchiveFileRelative,
             //    ArchivePaths.ExecutableRelative);
 
-            // await _extractLock.WaitAsync();
+            //await _extractLock.WaitAsync().ConfigureAwait(false);
             // 
             // try
             // {
@@ -581,7 +582,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
         [MemberNotNull(nameof(RuntimeDirectory))]
         [MemberNotNull(nameof(BinaryDirectory))]
         [MemberNotNull(nameof(AppName))]
-        protected void InitializingPaths(string? destination, string archiveFileRelative, string binaryFileRelative)
+        [MemberNotNull(nameof(_extractLock))]
+        protected void InitializePaths(string? destination, string archiveFileRelative, string binaryFileRelative)
         {
             archiveFileRelative = PathHelper.ReplacePathSeparatorsOnly(archiveFileRelative);
             binaryFileRelative = PathHelper.ReplacePathSeparatorsOnly(binaryFileRelative);
@@ -608,6 +610,8 @@ namespace Chris82111.GitManager.GitWrapper.Core
                     RuntimeDirectory = Path.Combine(ExtractDirectory, relativeExtractPath);
                 }
             }
+
+            _extractLock = GetExtractLock(ExtractDirectory);
 
             BinaryDirectory = Path.Combine(RuntimeDirectory, relativeBinaryPath);
             
@@ -708,6 +712,22 @@ namespace Chris82111.GitManager.GitWrapper.Core
         private void OnAfterProcessEnd()
         {
             AfterProcessEnd?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        ///         Gets the shared extraction lock for the specified directory.
+        /// <br/>   A separate <see cref="SemaphoreSlim"/> is maintained for each unique directory path.
+        /// <br/>   The directory path is converted to an absolute path before looking up the lock.
+        /// </summary>
+        /// <param name="extractDirectory">The path to the extraction directory.</param>
+        /// <returns>The shared <see cref="SemaphoreSlim"/> associated with the specified directory.</returns>
+        protected static SemaphoreSlim GetExtractLock(string extractDirectory)
+        {
+            string fullPath = Path.GetFullPath(extractDirectory);
+
+            return Multiton<SemaphoreSlim>.Instance(
+                _ => new SemaphoreSlim(1, 1),
+                fullPath);
         }
     }
 }
