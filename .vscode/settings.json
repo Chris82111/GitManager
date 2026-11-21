@@ -5,9 +5,13 @@
     "CAINFO",
     "finalizer",
     "GIT_CONFIG_NOSYSTEM",
+    "HMACSHA",
+    "Hostnames",
     "libc",
     "libexec",
-    "ssh-keygen",
-    "publickey"
+    "multiton",
+    "publickey",
+    "Renci",
+    "ssh-keygen"
   ]
 }

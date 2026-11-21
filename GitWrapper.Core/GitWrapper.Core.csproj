@@ -31,6 +31,11 @@ Supports: Locally installed Git and system-specific plugins</Description>
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
     <None Include="LICENSE" Pack="true" PackagePath="/" />
+    <None Include="THIRD_PARTY_LICENSES" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SSH.NET" Version="2026.0.1" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,27 @@
 # Build 
 
+<div align="center">
+
+  [![Shields](https://img.shields.io/badge/.NET-10.0-5C2D91)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0 "Download .NET 10.0")
+  [![Visual Studio](https://img.shields.io/badge/IDE-Visual_Studio-5C2D91)](https://visualstudio.microsoft.com/ "Download Visual Studio")
+  ![Linux x64](https://img.shields.io/badge/Linux-x64-009639)
+  ![Windows x64](https://img.shields.io/badge/Windows-x64-0067C0)
+  [![MIT](https://img.shields.io/badge/License-MIT-3ea63a)](https://spdx.org/licenses/MIT.html "Link to SPDX")
+
+  [![Docker Engine](https://img.shields.io/badge/build_dependency-Docker_Engine-0d4dF2)](https://docs.docker.com/engine/install "Link to web page")
+  [![WSL](https://img.shields.io/badge/build_dependency_(Windows)-WSL-00BCF2)](https://learn.microsoft.com/en-us/windows/wsl/install "Link to web page")
+
+  [![Git for Windows](https://img.shields.io/badge/dependency_(Windows)-Git_for_Windows-F1502F)](https://github.com/git-for-windows/git "Link to repository")
+  [![zlib, dependency for Git for Linux](https://img.shields.io/badge/dependency_(Linux)-zlib-2C652C)](https://zlib.net/ "Link to web page")
+  [![OpenSSL, dependency for Git for Linux](https://img.shields.io/badge/dependency_(Linux)-OpenSSL-731513)](https://github.com/openssl/openssl/ "Link to repository")
+  [![libpsl, dependency for Git for Linux](https://img.shields.io/badge/dependency_(Linux)-libpsl-394E79)](https://www.linuxfromscratch.org/blfs/view/svn/basicnet/libpsl.html "Link to web page")
+  [![curl, dependency for Git for Linux](https://img.shields.io/badge/dependency_(Linux)-curl-093754)](https://curl.se/download.html "Link to web page")
+  [![Git](https://img.shields.io/badge/dependency_(Linux)-Git_(source_code)-F1502F)](https://git-scm.com/install/source "Link to web page")
+
+  [![Dependency (NuGet): SSH.NET](https://img.shields.io/badge/dependency_(NuGet)-SSH.NET-512BD4)](https://www.nuget.org/packages/SSH.NET/ "Link to NuGet package")
+  
+</div>
+
 Except for the [#License](./LICENSES.md#license) and [#Acknowledgment](./../README.md#acknowledgment) sections, the following sections are only relevant to developers. This applies to those who want to clone the repository and compile it themselves. They can be skipped when using NuGet.
 
 Docker is required for the build process; WSL is also required on Windows.  

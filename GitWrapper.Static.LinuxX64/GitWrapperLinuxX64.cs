@@ -30,7 +30,7 @@ namespace Chris82111.GitManager.GitWrapper.Static.LinuxX64
         {
             EnsureSupported();
 
-            InitializingPaths(
+            InitializePaths(
                 destination,
                 ArchivePaths.ArchiveFileRelative,
                 ArchivePaths.ExecutableRelative);

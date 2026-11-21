@@ -29,12 +29,12 @@ namespace Chris82111.GitManager.GitWrapper.Static.WindowsX64
         {
             EnsureSupported();
 
-            InitializingPaths(
+            InitializePaths(
                 destination,
                 ArchivePaths.ArchiveFileRelative,
                 ArchivePaths.ExecutableRelative);
 
-            await _extractLock.WaitAsync();
+            await _extractLock.WaitAsync().ConfigureAwait(false);
 
             try
             {

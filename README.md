@@ -8,16 +8,6 @@
   ![Windows x64](https://img.shields.io/badge/Windows-x64-0067C0)
   [![MIT](https://img.shields.io/badge/Licence-MIT-3ea63a)](https://spdx.org/licenses/MIT.html "Link to SPDX")
 
-  [![Docker Engine](https://img.shields.io/badge/build_dependency-Docker_Engine-0d4dF2)](https://docs.docker.com/engine/install "Link to web page")
-  [![WSL](https://img.shields.io/badge/build_dependency_(Windows)-WSL-00BCF2)](https://learn.microsoft.com/en-us/windows/wsl/install "Link to web page")
-
-  [![Git for Windows](https://img.shields.io/badge/dependency_(Windows)-Git_for_Windows-F1502F)](https://github.com/git-for-windows/git "Link to repository")
-  [![zlib, dependency for Git for Linux](https://img.shields.io/badge/dependency_(Linux)-zlib-2C652C)](https://zlib.net/ "Link to web page")
-  [![OpenSSL, dependency for Git for Linux](https://img.shields.io/badge/dependency_(Linux)-OpenSSL-731513)](https://github.com/openssl/openssl/ "Link to repository")
-  [![libpsl, dependency for Git for Linux](https://img.shields.io/badge/dependency_(Linux)-libpsl-394E79)](https://www.linuxfromscratch.org/blfs/view/svn/basicnet/libpsl.html "Link to web page")
-  [![curl, dependency for Git for Linux](https://img.shields.io/badge/dependency_(Linux)-curl-093754)](https://curl.se/download.html "Link to web page")
-  [![Git](https://img.shields.io/badge/dependency_(Linux)-Git_(source_code)-F1502F)](https://git-scm.com/install/source "Link to web page")
-
 </div>
 
 This repository offers a convenient, cross-platform solution for using Git in a portable form for Linux and Windows. As a powerful wrapper, it abstracts the complexity of Git integration and enables quick and easy integration into existing development environments.
@@ -77,8 +67,9 @@ This repository has the [MIT](https://spdx.org/licenses/MIT.html) license ([LICE
 
 This repository provides a wrapper that builds on other essential projects. To acknowledge these foundational projects and their developers, the projects used are listed below:  
 
-- Zlib: This product includes software developed by the Zlib Project. (https://www.zlib.net/) 
-- OpenSSL: This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/)
-- libpsl: This product includes software developed by the libpsl Project. (https://github.com/rockdaboot/libpsl/tree/master)
-- libcurl: This product includes software developed by the curl Project. (https://curl.se/)
-- Git: This product includes software developed by the Git Project. (https://git-scm.com/)
+- Zlib: This product includes software developed by the Zlib project. (https://www.zlib.net/) 
+- OpenSSL: This product includes software developed by the OpenSSL project for use in the OpenSSL Toolkit (http://www.openssl.org/)
+- libpsl: This product includes software developed by the libpsl project. (https://github.com/rockdaboot/libpsl/tree/master)
+- libcurl: This product includes software developed by the curl project. (https://curl.se/)
+- Git: This product includes software developed by the Git project. (https://git-scm.com/)
+- SSH.NET: This product includes software developed by the SSH.NET project. (https://github.com/sshnet/SSH.NET)

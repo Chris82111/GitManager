@@ -1,6 +1,7 @@
 ﻿using Chris82111.GitManager.GitWrapper.Core;
 using Chris82111.GitManager.GitWrapper.Core.Authenticators;
 using Chris82111.GitManager.GitWrapper.Core.EnvironmentVariables;
+using Chris82111.GitManager.GitWrapper.Core.KnownHosts;
 using Chris82111.GitManager.GitWrapper.Core.Processes;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -13,6 +14,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
     {
         private sealed class ConfigData
         {
+            public required string Host { get; init; }
+            public required int Port { get; init; }
+            public required string Fingerprint { get; init; }
             public required string Username { get; init; }
             public required string Token { get; init; }
             public required string PrivateRepo { get; init; }
@@ -23,6 +27,11 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             public required string SshFilePassword { get; init; }
         }
 
+        /// <summary>
+        /// This file must be created in the user's home directory for testing on Linux and Windows:
+        /// <br/>   Linux:   <c>~/.GitManager.json</c>
+        /// <br/>   Windows: <c>%USERPROFILE%\.GitManager.json</c>
+        /// </summary>
         private const string _configFile = ".GitManager.json";
 
         private readonly ConfigData? _configData = null;
@@ -47,6 +56,9 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 #else
                 new()
                 {
+                    Host = "",
+                    Port = 22,
+                    Fingerprint = "",
                     Username = "",
                     Token = "",
                     PrivateRepo = "",
@@ -93,6 +105,32 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             if (null == _configData)
             {
                 Assert.Inconclusive(_configErrorMessage ?? "The configuration DTO must not be null.");
+            }
+
+            var auth = new GitAuthenticationBase();
+            auth.SetSsh(_configData!.SshFilePwProtected, _configData.SshFilePassword);
+            var keyType = auth.SshKeyTypes().First();
+
+            if (false == auth.IsSshSecure())
+            {
+                auth.SecureSshFile();
+            }
+            Assert.IsTrue(auth.IsSshSecure());
+        }
+
+        private void EnsureSystemKnownHostsFile()
+        {
+            EnsureConfigData();
+
+            var auth = new GitAuthenticationBase();
+            auth.SetSsh(_configData.SshFilePwProtected, _configData.SshFilePassword);
+            var keyType = auth.SshKeyTypes().First();
+
+            var knownHostsFile = new KnownHostsFile(KnownHostsFile.GetUserKnownHostsPath());
+            var available = knownHostsFile.FindHosts(_configData.Host, keyType, host => host.FingerprintSha256 == _configData.Fingerprint).Any();
+            if (false == available)
+            {
+                Assert.Inconclusive($"The system-standard known_hosts file '{KnownHostsFile.GetUserKnownHostsPath()}' does not contain a GitHub '{keyType}' key.");
             }
         }
 
@@ -559,7 +597,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         {
             EnsureConfigData();
             var git = EnsureGitWrapper();
-            RemoveMirror(_configData!.PrivateRepoSsh);
+            RemoveMirror(_configData.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
 
             git.Credential = Credentials.Ssh;
@@ -579,23 +617,20 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         public void Test_13_SshRightUrl()
         {
             EnsureConfigData();
+            EnsureSystemKnownHostsFile();
             var git = EnsureGitWrapper();
-            RemoveMirror(_configData!.PrivateRepoSsh);
+            RemoveMirror(_configData.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
 
             git.Credential = Credentials.Ssh;
 
             git.Authentication.SetSsh(_configData.SshFileInvalid, string.Empty);
+
             var dto = git.Mirror(_configData.PrivateRepoSsh);
             Assert.AreEqual(128, dto.ExitCode);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
 
             git.Authentication.SetSsh(_configData.SshFile, string.Empty);
-
-#warning find a better position for that
-            // var fileOk = git.Authentication.IsSshSecure();
-            // git.Authentication.SecureSshFile();
-            // fileOk = git.Authentication.IsSshSecure();
 
             dto = git.Mirror(_configData.PrivateRepoSsh);
             Assert.AreEqual(0, dto.ExitCode);
@@ -606,6 +641,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         public void Test_14_SshPassword()
         {
             EnsureConfigData();
+            EnsureSystemKnownHostsFile();
             var git = EnsureGitWrapper();
             RemoveMirror(_configData!.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
@@ -613,12 +649,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             git.Credential = Credentials.Ssh;
 
             git.Authentication.SetSsh(_configData.SshFilePwProtected, _configData.SshFilePassword);
-
-#warning find a better position for that
-            // var fileOk = git.Authentication.IsSshSecure();
-            // git.Authentication.SecureSshFile();
-            // fileOk = git.Authentication.IsSshSecure();
-            
+                        
             var dto = git.Mirror(_configData.PrivateRepoSsh);
 
             File.WriteAllText("log.txt", dto.StandardError);
@@ -632,7 +663,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         {
             EnsureConfigData();
             var git = EnsureGitWrapper();
-            RemoveMirror(_configData!.PrivateRepoSsh);
+            RemoveMirror(_configData.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
 
             git.Credential = Credentials.Ssh;
@@ -649,7 +680,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
         {
             EnsureConfigData();
             var git = EnsureGitWrapper();
-            RemoveMirror(_configData!.PrivateRepoSsh);
+            RemoveMirror(_configData.PrivateRepoSsh);
             Assert.IsFalse(MirrorDirectory(_configData.PrivateRepoSsh).Exists);
 
             git.Credential = Credentials.Ssh;
@@ -667,7 +698,7 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             EnsureConfigData();
             var git = new GitWrapperSystem();
             git.Credential = Credentials.Ssh;
-            git.Authentication.SetSsh(_configData!.SshFilePwProtected, _configData.SshFilePassword);
+            git.Authentication.SetSsh(_configData.SshFilePwProtected, _configData.SshFilePassword);
             var dto = git.Mirror(_configData.PrivateRepoSsh);
 
             Assert.AreEqual(128, dto.ExitCode);
@@ -680,11 +711,16 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             EnsureConfigData();
             var dir1 = "./d1";
             var dir2 = "./d2";
+            var bin1 = "./bin1";
+            var bin2 = "./bin2";
             RemoveDirectory(dir1);
             RemoveDirectory(dir2);
+            RemoveDirectory(bin1);
+            RemoveDirectory(bin2);
             Assert.IsFalse(Directory.Exists(dir1));
             Assert.IsFalse(Directory.Exists(dir2));
-            RemoveDirectory(".bin");
+            Assert.IsFalse(Directory.Exists(bin1));
+            Assert.IsFalse(Directory.Exists(bin2));
 
 
 
@@ -692,21 +728,21 @@ namespace Chris82111.GitManager.GitWrapper.Tests
             var git2 = GitWrapperFactory.Create();
             
             await Task.WhenAll(
-                git1.ExtractArchiveAsync(),
-                git2.ExtractArchiveAsync());
+                git1.ExtractArchiveAsync(bin1),
+                git2.ExtractArchiveAsync(bin2));
 
             var auth = new GitAuthenticationBase();
-            auth.SetSsh(_configData!.SshFilePwProtected, _configData.SshFilePassword);
+            auth.SetToken(_configData.Username, _configData.Token);
 
             git1.Authentication = auth;
             git2.Authentication = auth;
             
-            git1.Credential = Credentials.Ssh;
-            git2.Credential = Credentials.Ssh;
+            git1.Credential = Credentials.Token;
+            git2.Credential = Credentials.Token;
             
             var results = await Task.WhenAll(
-                git1.MirrorAsync(_configData.PrivateRepoSsh, dir1),
-                git2.MirrorAsync(_configData.PrivateRepoSsh, dir2));
+                git1.MirrorAsync(_configData.PrivateRepo, dir1),
+                git2.MirrorAsync(_configData.PrivateRepo, dir2));
 
             var dto1 = results[0];
             var dto2 = results[1];
@@ -714,12 +750,57 @@ namespace Chris82111.GitManager.GitWrapper.Tests
 
 
             Assert.AreEqual(0, dto1.ExitCode);
-            Assert.IsTrue(Directory.Exists(Path.Combine(dir1, MirrorDirectory(_configData.PrivateRepoSsh).Name)));
+            Assert.IsTrue(Directory.Exists(Path.Combine(dir1, MirrorDirectory(_configData.PrivateRepo).Name)));
             Assert.AreEqual(0, dto2.ExitCode);
-            Assert.IsTrue(Directory.Exists(Path.Combine(dir1, MirrorDirectory(_configData.PrivateRepoSsh).Name)));
+            Assert.IsTrue(Directory.Exists(Path.Combine(dir1, MirrorDirectory(_configData.PrivateRepo).Name)));
 
             RemoveDirectory(dir1);
             RemoveDirectory(dir2);
+            RemoveDirectory(bin1);
+            RemoveDirectory(bin2);
+        }
+
+        [TestMethod]
+        public async Task Test_Example7()
+        {
+            EnsureConfigData();
+            var dir = "./d";
+            RemoveDirectory(dir);
+            Assert.IsFalse(Directory.Exists(dir));
+            RemoveDirectory(".bin");
+            System.IO.File.Delete("known_hosts");
+
+
+
+            var git = GitWrapperFactory.Create();
+
+            await git.ExtractArchiveAsync();
+
+            var auth = new GitAuthenticationBase();
+            auth.SetSsh(_configData.SshFilePwProtected, _configData.SshFilePassword);
+            auth.SecureSshFile();
+
+            var keyType = auth.SshKeyTypes().First();
+
+            var knownHostFile = await KnownHostMultiton.InstanceAsync("known_hosts");
+            await knownHostFile.VerifyAndAddHostAsync(_configData.Host, keyType, _configData.Fingerprint);
+            await knownHostFile.WriteAsync();
+
+            auth.KnownHostsFiles.Add(knownHostFile);
+            auth.KnownHostsFileSelection = KnownHostsFileSelection.ListedFiles;
+            
+            git.Authentication = auth;
+
+            git.Credential = Credentials.Ssh;
+
+            var dto1 = await git.MirrorAsync(_configData.PrivateRepoSsh, dir);
+
+
+
+            Assert.AreEqual(0, dto1.ExitCode);
+            Assert.IsTrue(Directory.Exists(Path.Combine(dir, MirrorDirectory(_configData.PrivateRepoSsh).Name)));
+
+            RemoveDirectory(dir);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Chris82111.GitManager.GitWrapper.Core.Processes;
+﻿using Chris82111.GitManager.GitWrapper.Core.KnownHosts;
+using Chris82111.GitManager.GitWrapper.Core.Processes;
 
 namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
 {
@@ -25,7 +26,7 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// <br/>   true:  disposed
         /// <br/>   false: usable
         /// </summary>
-        public bool IsDisposed { get; }
+        bool IsDisposed { get; }
 
         /// <summary>
         ///         Here, the user can register their own handler. As an alternative to deriving from the
@@ -40,6 +41,17 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// </code>
         /// </summary>
         Action<object?, ProcessEventArgs>? UserAction { get; set; }
+
+        /// <summary>
+        /// When using SSH, this option allows changing the behavior of selecting known hosts.
+        /// </summary>
+        KnownHostsFileSelection KnownHostsFileSelection { get; set; }
+
+        /// <summary>
+        ///         List of known host files. These are used only with SSH or when the
+        /// <br/>   <see cref="KnownHostsFileSelection"/> property is set to <see cref="KnownHostsFileSelection.ListedFiles"/>.
+        /// </summary>
+        List<KnownHostsFile> KnownHostsFiles { get; set; }
 
         /// <summary>
         ///         Performs all object cleanup
@@ -90,9 +102,28 @@ namespace Chris82111.GitManager.GitWrapper.Core.Authenticators
         /// </summary>
         void ClearToken();
 
+        /// <summary>
+        ///         Determines whether the SSH file has secure Unix permissions,
+        /// <br/>   restricting access to the owner only.
+        /// <br/>   If it is necessary the <see cref="SecureSshFile"/> method can fix this.
+        /// </summary>
+        /// <returns>
+        ///         true: If the file permissions are secure or the system does not require Unix permission checks.
+        /// <br/>   false: If the file does not exist or its permissions are insecure.
+        /// </returns>
         bool IsSshSecure();
 
+        /// <summary>
+        ///         Sets the SSH file permissions to allow read and write access
+        /// <br/>   only to the file owner on supported Unix operating systems.
+        /// </summary>
         void SecureSshFile();
+
+        /// <summary>
+        /// Gets the supported SSH key algorithm types of the private key.
+        /// </summary>
+        /// <returns>A list of supported SSH key algorithm names.</returns>
+        List<string> SshKeyTypes();
 
         /// <summary>
         /// Returns whether the SSH information has been set correctly
