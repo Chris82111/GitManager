@@ -1,5 +1,7 @@
 <Project>
-
+  
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)..'))" />
+  
   <PropertyGroup>
       
     <!-- The Runtime Identifier (RID) is set by `RuntimeIdentifier` tag in *.csproj file or via dash `r` or double-dash `runtime` parameter. -->

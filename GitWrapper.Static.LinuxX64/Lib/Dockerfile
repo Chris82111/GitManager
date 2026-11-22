@@ -55,13 +55,13 @@ FROM ubuntu:24.04 AS base_stage
 
 # (3) Build zlib
 # Update: https://zlib.net/
-ENV zlibUrl="https://zlib.net/zlib-1.3.2.tar.gz"
-ENV zlibSha256="bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16"
+ENV zlibUrl="https://zlib.net/zlib-1.4.tar.gz"
+ENV zlibSha256="02dd159783677a749c04adbdd02b55b8a2bcc7e054f51b76b549199a916ad584"
 
 # (4) Build OpenSSL
 # Update: https://github.com/openssl/openssl/releases
-ENV openSslUrl="https://github.com/openssl/openssl/releases/download/openssl-4.0.2/openssl-4.0.2.tar.gz"
-ENV openSslSha256="736b467530f916737b7031310ccb21d8218c6229e61e8e160cd1d3458cd543a8"
+ENV openSslUrl="https://github.com/openssl/openssl/releases/download/openssl-4.1.0/openssl-4.1.0.tar.gz"
+ENV openSslSha256="50c17baf54cb008f6ce42d50deb4b28050a1aad711636cabd4b241c7e90cc2fd"
 
 # (5) Build libpsl
 # Update: https://www.linuxfromscratch.org/blfs/view/svn/basicnet/libpsl.html
@@ -72,18 +72,21 @@ ENV libpslSha256="93941f85a1e7bd593fa94f299233cb5dfc91cd144fd9a78a6ceb75001c5b03
 # (6) Build libcurl (Git HTTPS support)
 # Update: https://curl.se/download.html
 # Update: https://github.com/curl/curl/releases
-ENV libcurlUrl="https://curl.se/download/curl-8.22.0.tar.gz"
-ENV libcurlSha256="d54dd598bf05927a726deb38df31c6a255ba83ff1de57c5d1464dac3ed8f44a1"
+ENV libcurlUrl="https://github.com/curl/curl/releases/download/curl-8_23_0/curl-8.23.0.tar.gz"
+ENV libcurlSha256="e3de77cfa6367083c776a26647fc9f633b538c06c3baa73d931a252ac8f72b49"
 
 # (7) Build Git
 # Update: https://git-scm.com/install/source
-# signatures:
+# signatures, see the documentation: ./Docs/GIT_GPG_VERIFICATION.md:
+# Remove: GitManager/GitWrapper.Static.LinuxX64/runtimes/linux-x64/native/GitLinux.tar.gz
+#         docker rm -f staticgitbuildexporttemp
+#         docker rmi -f staticgitbuildtempimage
+#         docker builder prune -a -f
 #   https://www.kernel.org/category/signatures.html
+#   https://www.kernel.org/pub/software/scm/git/
 #   https://gitlab.com/gitlab-org/git/-/tags/junio-gpg-pub
-#   gzip -dk *.tar.gz
-#   gpg --verify *.tar.sign *.tar
-ENV gitUrl="https://www.kernel.org/pub/software/scm/git/git-2.55.0.tar.gz"
-ENV gitSha256="0842dc384a23ac33ba3e570c4f3a8ded85963ee4713b1cd21153c3db41813d1e"
+ENV gitUrl="https://www.kernel.org/pub/software/scm/git/git-2.56.1.tar.gz"
+ENV gitSha256="fd0c0495427dc9ac445fdced8e36bb5eb6f233a14da5db3c6dfd8dcfa7f85761"
 
 
 #------------------------------------------------------------------------------
