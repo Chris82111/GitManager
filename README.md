@@ -7,6 +7,7 @@
   ![Linux x64](https://img.shields.io/badge/Linux-x64-009639)
   ![Windows x64](https://img.shields.io/badge/Windows-x64-0067C0)
   [![MIT](https://img.shields.io/badge/Licence-MIT-3ea63a)](https://spdx.org/licenses/MIT.html "Link to SPDX")
+  ![Tests](https://github.com/Chris82111/GitManager/actions/workflows/test.yml/badge.svg?branch=task-github_action)
 
 </div>
 
