@@ -1,7 +1,9 @@
 name: Tests
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - test-github_action
 
 permissions:
   contents: read
